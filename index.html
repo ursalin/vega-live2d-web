@@ -40,16 +40,17 @@
                 const model = await PIXI.live2d.Live2DModel.from('aolan/aolan.model3.json');
                 app.stage.addChild(model);
 
-                // Auto Fit Strategy: 
-                // We calculate how much we need to scale the model so its height fits exactly 80% of the screen height
-                const targetHeight = innerHeight * 0.8;
+                // Forcing an absolute alignment strategy:
+                // We fit the height exactly to the window, and forcefully anchor to the bottom edge.
+                const targetHeight = innerHeight * 1.0; 
                 const scaleRatio = targetHeight / model.height;
-                
                 model.scale.set(scaleRatio);
                 
-                // Center it explicitly based on the new scaled width and height
                 model.x = (innerWidth / 2) - ((model.width * scaleRatio) / 2);
-                model.y = (innerHeight / 2) - ((model.height * scaleRatio) / 2);
+                
+                // Let's pull him UP forcefully. If he was sinking, we subtract extra offset.
+                // model.y = 0 means his top head touches the top of screen.
+                model.y = 0; 
 
                 app.stage.interactive = true;
                 app.stage.hitArea = new PIXI.Rectangle(0, 0, innerWidth, innerHeight);
@@ -59,13 +60,11 @@
 
                 statusEl.innerText = 'Vega Online ✨ (Move mouse to interact)';
                 
-                // Handle Window Resize properly
                 window.addEventListener('resize', () => {
-                    const newTargetHeight = innerHeight * 0.8;
-                    const newScaleRatio = newTargetHeight / model.height;
+                    const newScaleRatio = innerHeight / model.height;
                     model.scale.set(newScaleRatio);
                     model.x = (innerWidth / 2) - ((model.width * newScaleRatio) / 2);
-                    model.y = (innerHeight / 2) - ((model.height * newScaleRatio) / 2);
+                    model.y = 0;
                 });
 
             } catch (err) {
