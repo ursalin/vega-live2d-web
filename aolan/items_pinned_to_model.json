@@ -1,0 +1,1050 @@
+{
+    "FileMetadata": {
+        "LastSavedVTubeStudioVersion": "1.32.3",
+        "LastSavedPlatform": "Steam",
+        "LastSavedDateUTC": "Friday, 29 August 2025, 16:26:59",
+        "LastSavedDateLocalTime": "Saturday, 30 August 2025, 00:26:59",
+        "LastSavedDateUnixMillisecondTimestamp": "1756484819233"
+    },
+    "SceneName": "",
+    "SceneGroupName": "",
+    "SceneModel": "",
+    "SceneID": "",
+    "Items": [
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "966c25a1171836630c878baa5e96729d.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -64412
+            },
+            "ItemFileName": "966c25a1171836630c878baa5e96729d.png_tplv-obj.png",
+            "ItemInstanceUUID": "dbbd075064d84d62a445b27e4749db58",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 10,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh532",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "14 15 17 16 12 18",
+            "PinnedVertexPositions": [
+                {
+                    "x": -0.24407973885536195,
+                    "y": 0.3728962242603302,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.236394003033638,
+                    "y": 0.33649659156799319,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.2807724177837372,
+                    "y": 0.3309413194656372,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.29276028275489809,
+                    "y": 0.37058040499687197,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.2040003091096878,
+                    "y": 0.3649347424507141,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.26479941606521609,
+                    "y": 0.29639574885368349,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": -0.0043239593505859379,
+                "y": 0.00996372103691101,
+                "z": 0.0
+            },
+            "Size": 0.07334739714860916,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 0.866549551486969,
+            "Position": {
+                "x": -0.26542940735816958,
+                "y": 0.35277634859085085,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "ce62ca3f07fc2a7df9549ac507fb477",
+            "ItemObjectInScene": {
+                "instanceID": -64630
+            },
+            "ItemFileName": "ce62ca3f07fc2a7df9549ac507fb477.png",
+            "ItemInstanceUUID": "66ce4a0dc1e74bcea294a1db3a2033d1",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 1,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh703",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "119 109 108 120 118 131",
+            "PinnedVertexPositions": [
+                {
+                    "x": -0.002972356742247939,
+                    "y": 0.5086358189582825,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.0019452302949503065,
+                    "y": 0.5167934894561768,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.007436899933964014,
+                    "y": 0.5169994831085205,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.006494141649454832,
+                    "y": 0.5089673399925232,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.012612195685505867,
+                    "y": 0.5087358355522156,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.0017447147984057665,
+                    "y": 0.5003388524055481,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": -0.00020745443180203438,
+                "y": 0.0003618597984313965,
+                "z": 0.0
+            },
+            "Size": 0.06400950998067856,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 359.1542663574219,
+            "Position": {
+                "x": 0.014814399182796479,
+                "y": 0.5120123624801636,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "a11c3b7b0dcad79f998f1a6764183144.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -64848
+            },
+            "ItemFileName": "a11c3b7b0dcad79f998f1a6764183144.png_tplv-obj.png",
+            "ItemInstanceUUID": "5befdc421cb6477197243df72fa9eea2",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 3,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh234",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "193 195 191 158 161 155",
+            "PinnedVertexPositions": [
+                {
+                    "x": 0.07307660579681397,
+                    "y": 0.3218526244163513,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.053898315876722339,
+                    "y": 0.3030691146850586,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.08191116154193878,
+                    "y": 0.3401700556278229,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.030579281970858575,
+                    "y": 0.3493615388870239,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.027221860364079477,
+                    "y": 0.3456575274467468,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.03389054164290428,
+                    "y": 0.3533320724964142,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": 0.007738444954156876,
+                "y": -0.010665327310562134,
+                "z": 0.0
+            },
+            "Size": 0.03528934717178345,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 350.1139221191406,
+            "Position": {
+                "x": 0.06433916091918946,
+                "y": 0.3277474045753479,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "18d24d506b1fdf28deb656dc64d00405.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -65066
+            },
+            "ItemFileName": "18d24d506b1fdf28deb656dc64d00405.png_tplv-obj.png",
+            "ItemInstanceUUID": "442a91f65dc04726b7e583e774a1a1cd",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 7,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh533",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "13 14 11 16 12 10",
+            "PinnedVertexPositions": [
+                {
+                    "x": 0.23097781836986543,
+                    "y": 0.4131559431552887,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.22191914916038514,
+                    "y": 0.3746580183506012,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.1996268928050995,
+                    "y": 0.4012995660305023,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.25319162011146548,
+                    "y": 0.37883833050727847,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.1929638832807541,
+                    "y": 0.3666711151599884,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.1989431381225586,
+                    "y": 0.4390198886394501,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": 0.010575175285339356,
+                "y": -0.0013877451419830323,
+                "z": 0.0
+            },
+            "Size": 0.07334739714860916,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 5.35013484954834,
+            "Position": {
+                "x": 0.2739351689815521,
+                "y": 0.3569086790084839,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "c4a680309743894219ccfd0042895970.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -65284
+            },
+            "ItemFileName": "c4a680309743894219ccfd0042895970.png_tplv-obj.png",
+            "ItemInstanceUUID": "3d1a5ec50e8c43a1a916ee937b118fa9",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 11,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh532",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "8 10 11 7 9 6",
+            "PinnedVertexPositions": [
+                {
+                    "x": -0.1371963918209076,
+                    "y": 0.40409770607948305,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.15594516694545747,
+                    "y": 0.44051113724708559,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.17937074601650239,
+                    "y": 0.40855979919433596,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.10721011459827423,
+                    "y": 0.4272257685661316,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.16023597121238709,
+                    "y": 0.38008061051368716,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.12491533905267716,
+                    "y": 0.3682449460029602,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": -0.0037116557359695436,
+                "y": 0.015364110469818116,
+                "z": 0.0
+            },
+            "Size": 0.07334739714860916,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 359.1541442871094,
+            "Position": {
+                "x": -0.17216774821281434,
+                "y": 0.41558900475502016,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "6a6785c1998b880d1881a03e0d7dc1cb.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -65502
+            },
+            "ItemFileName": "6a6785c1998b880d1881a03e0d7dc1cb.png_tplv-obj.png",
+            "ItemInstanceUUID": "851b3b765246456caf979d2592269b14",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 2,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh533",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "7 5 8 6 4 3",
+            "PinnedVertexPositions": [
+                {
+                    "x": 0.16820235550403596,
+                    "y": 0.4362393021583557,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.14732812345027924,
+                    "y": 0.4008603096008301,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.19733291864395142,
+                    "y": 0.39885517954826357,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.17478100955486298,
+                    "y": 0.37235012650489809,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.11422981321811676,
+                    "y": 0.4270001947879791,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.13407744467258454,
+                    "y": 0.3648534417152405,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": 0.015324801206588745,
+                "y": 0.020275354385375978,
+                "z": 0.0
+            },
+            "Size": 0.07828839868307114,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 357.9602966308594,
+            "Position": {
+                "x": 0.15721893310546876,
+                "y": 0.4236661195755005,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "35f3ce2fce25d4c380012d41ce120972.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -65720
+            },
+            "ItemFileName": "35f3ce2fce25d4c380012d41ce120972.png_tplv-obj.png",
+            "ItemInstanceUUID": "92e2a6a8b37341efb2e24ddfd1757816",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 5,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh234",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "72 69 75 194 73 70",
+            "PinnedVertexPositions": [
+                {
+                    "x": -0.029243238270282747,
+                    "y": 0.34471839666366579,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.03262096643447876,
+                    "y": 0.3483409583568573,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.025779077783226968,
+                    "y": 0.34106406569480898,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.05488572269678116,
+                    "y": 0.301891565322876,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.026151807978749276,
+                    "y": 0.3442721366882324,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.02952982485294342,
+                    "y": 0.347893625497818,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": -0.014325752854347229,
+                "y": -0.010310441255569458,
+                "z": 0.0
+            },
+            "Size": 0.024641532450914384,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 36.28042984008789,
+            "Position": {
+                "x": -0.03374849259853363,
+                "y": 0.3327195644378662,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "852bcf86b613a1ec0c63fa134e5e91cf.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -65938
+            },
+            "ItemFileName": "852bcf86b613a1ec0c63fa134e5e91cf.png_tplv-obj.png",
+            "ItemInstanceUUID": "842af313ff3d441b91749832247bcf88",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 4,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh720",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "64 62 66 84 68 82",
+            "PinnedVertexPositions": [
+                {
+                    "x": 0.003697312204167247,
+                    "y": 0.2487533986568451,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.0036366439890116455,
+                    "y": 0.25310495495796206,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.0018016250105574728,
+                    "y": 0.2468436062335968,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.006952567026019096,
+                    "y": 0.24673977494239808,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.0005192251410335302,
+                    "y": 0.2507615089416504,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.009754426777362824,
+                    "y": 0.24842959642410279,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": -0.00006950413808226585,
+                "y": 0.0009632110595703125,
+                "z": 0.0
+            },
+            "Size": 0.04463046416640282,
+            "ModelScaleMultiplier": 0.007940036244690419,
+            "Rotation": 350.52001953125,
+            "Position": {
+                "x": 0.0112833883613348,
+                "y": 0.2522529065608978,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        },
+        {
+            "VNetJustBorrowedFrom": 0,
+            "VNetJustBorrowedFromItemID": -1,
+            "ItemName": "df91de960a7accbddef138dff217a50f.png_tplv-obj",
+            "ItemObjectInScene": {
+                "instanceID": -71634
+            },
+            "ItemFileName": "df91de960a7accbddef138dff217a50f.png_tplv-obj.png",
+            "ItemInstanceUUID": "20251d8aa7704fdc8e027133bf09ce73",
+            "Selected": true,
+            "TrackingModel": true,
+            "IsAnimated": false,
+            "IsVideo": false,
+            "IsModel": false,
+            "IsWeb": false,
+            "IsCensored": false,
+            "IsFlipped": false,
+            "IsLocked": false,
+            "Smoothing": 0.0,
+            "Order": 6,
+            "FPS": -1.0,
+            "IsPinned": true,
+            "PinnedTo": "ArtMesh410",
+            "PinnedModel_Live2D": "敖澜",
+            "PinnedModel_VTS": "敖澜",
+            "PinnedModel_InternalID": "cbb245a4f9134cc1a80595dcfb263cae",
+            "PinnedVertexIDs": "56 24 25 57 55 67",
+            "PinnedVertexPositions": [
+                {
+                    "x": 0.010585779324173928,
+                    "y": 0.13715694844722749,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.0037037432193756105,
+                    "y": 0.1276462972164154,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.009842561557888985,
+                    "y": 0.15532441437244416,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.024065328761935235,
+                    "y": 0.1646338850259781,
+                    "z": 0.0
+                },
+                {
+                    "x": -0.005112867336720228,
+                    "y": 0.10836554318666458,
+                    "z": 0.0
+                },
+                {
+                    "x": 0.04133200645446777,
+                    "y": 0.1366569548845291,
+                    "z": 0.0
+                }
+            ],
+            "PinnedVertexCenterOffset": {
+                "x": -0.009951749816536904,
+                "y": 0.001946091651916504,
+                "z": 0.0
+            },
+            "Size": 0.12245660275220871,
+            "ModelScaleMultiplier": 0.010719149373471737,
+            "Rotation": 0.0,
+            "Position": {
+                "x": 0.01448306255042553,
+                "y": 0.14005421102046967,
+                "z": 0.0
+            },
+            "Group": "",
+            "Scene": "",
+            "AssetType": 1,
+            "FromWorkshop": false,
+            "FromHotkey": false,
+            "FromAPI": false,
+            "FadeTime": 0.5,
+            "Plugin": "",
+            "WebItemURL": "",
+            "WebItemUseCustomCSS": false,
+            "WebItemCustomCSS": "body {\n    background-color: rgba(0, 0, 0, 0);\n    margin: 0px auto;\n    overflow: hidden;\n}",
+            "WebItemZoomPercent": 100,
+            "WebItemAlphaMultiplier": 1.0,
+            "WebItemCropLeftRightTopBottom": {
+                "x": 0.0,
+                "y": 0.0,
+                "z": 0.0,
+                "w": 0.0
+            },
+            "WebItemSizeInUnityUnits": {
+                "x": 0.6000000238418579,
+                "y": 0.30000001192092898
+            },
+            "WebItemSizeInPixels": {
+                "x": 1024,
+                "y": 576
+            },
+            "WebItemMuted": false,
+            "WebItemAllowLocalURLs": false,
+            "WebItemAllowTransparentBackground": true,
+            "WebItemInteractable": true,
+            "WebItemScrollSensitivity": 0.4000000059604645,
+            "WithinModelPin_On": false,
+            "WithinModelPin_BackOn": false,
+            "WithinModelPin_Layer": -1,
+            "WithinModelPin_ArtMeshID": "<<<LAYER_SPECIAL_TOP>>>",
+            "WithinModelPin_ArtMeshIDBackLayers": "<<<LAYER_SPECIAL_BOTTOM>>>",
+            "WithinModelPin_DoNotPinToLayersAboveItem": true,
+            "WithinModelPin_SpecificPinLayer_On": false,
+            "WithinModelPin_SpecificPinLayer": "",
+            "WithinModelPin_ShowFrontBack": false,
+            "WithinModelPin_SplitLive2DItemAt": ""
+        }
+    ]
+}

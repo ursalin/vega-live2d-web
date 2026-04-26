@@ -1,0 +1,15 @@
+{
+    "Type": "Live2D Expression",
+    "Parameters": [
+        {
+            "Id": "qh_7",
+            "Value": 1.0,
+            "Blend": "Add"
+        },
+        {
+            "Id": "qh_8",
+            "Value": 1.0,
+            "Blend": "Add"
+        }
+    ]
+}

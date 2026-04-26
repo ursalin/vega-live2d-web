@@ -1,0 +1,25 @@
+{
+	"Version": 3,
+	"FileReferences": {
+		"Moc": "aolan.moc3",
+		"Textures": [
+			"aolan.8192/texture_00.png",
+			"aolan.8192/texture_01.png",
+			"aolan.8192/texture_02.png"
+		],
+		"Physics": "aolan.physics3.json",
+		"DisplayInfo": "aolan.cdi3.json"
+	},
+	"Groups": [
+		{
+			"Target": "Parameter",
+			"Name": "LipSync",
+			"Ids": []
+		},
+		{
+			"Target": "Parameter",
+			"Name": "EyeBlink",
+			"Ids": []
+		}
+	]
+}
