@@ -3,15 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vega - Live2D Screen Embodiment</title>
+    <title>Vega - Live2D Lipsync Test</title>
     <style>
         body { margin: 0; padding: 0; background-color: #2c2c2c; overflow: hidden; width: 100vw; height: 100vh; }
         canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
         #status { position: absolute; top: 10px; left: 10px; color: #fff; font-family: monospace; z-index: 999;}
-        /* Add some basic controls */
-        #controls { position: absolute; bottom: 10px; left: 10px; color: #fff; font-family: monospace; z-index: 999; display: flex; gap: 10px;}
-        button { background: rgba(0,0,0,0.5); color: white; border: 1px solid #555; padding: 5px 10px; cursor: pointer; border-radius: 4px; }
-        button:hover { background: rgba(255,255,255,0.2); }
+        #controls { position: absolute; bottom: 20px; left: 10px; color: #fff; font-family: monospace; z-index: 999; display: flex; gap: 10px; flex-wrap: wrap; width: 90vw;}
+        button { background: rgba(0,0,0,0.7); color: #0f0; border: 1px solid #0f0; padding: 10px 15px; cursor: pointer; border-radius: 4px; font-weight: bold;}
+        button:hover { background: rgba(0,255,0,0.2); }
+        audio { display: none; }
     </style>
     <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
@@ -20,12 +20,16 @@
 <body>
     <div id="status">Loading Vega's Shell...</div>
     <div id="controls">
+        <button id="talkBtn" onclick="startTalking()">🎤 播放测试语音 (Lipsync Test)</button>
         <button onclick="zoomOut()">🔍 Zoom Out</button>
         <button onclick="zoomIn()">🔎 Zoom In</button>
-        <button onclick="moveUp()">⬆️ Move Up</button>
-        <button onclick="moveDown()">⬇️ Move Down</button>
+        <button onclick="moveUp()">⬆️ Up</button>
+        <button onclick="moveDown()">⬇️ Down</button>
     </div>
     <canvas id="canvas"></canvas>
+    
+    <!-- A sample TTS audio file -->
+    <audio id="testAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" crossorigin="anonymous"></audio>
 
     <script>
         const app = new PIXI.Application({
@@ -40,28 +44,26 @@
         const statusEl = document.getElementById('status');
         let currentModel = null;
         let baseScale = 1;
+        
+        // Audio Context variables
+        let audioCtx, analyser, source;
+        let dataArray;
+        let isAudioPlaying = false;
 
         async function init() {
             try {
-                if (!PIXI.live2d || !PIXI.live2d.Live2DModel) {
-                    throw new Error("Live2D plugin did not load properly.");
-                }
-
                 statusEl.innerText = 'Loading Model Data...';
-                
                 const model = await PIXI.live2d.Live2DModel.from('aolan/aolan.model3.json');
                 currentModel = model;
                 app.stage.addChild(model);
 
-                // Make him much smaller to fit the whole body, and shift him up
                 const targetHeight = innerHeight * 0.95; 
                 baseScale = targetHeight / model.height;
                 model.scale.set(baseScale);
-                
                 model.x = (innerWidth / 2) - ((model.width * baseScale) / 2);
-                model.y = - (model.height * baseScale * 0.1); // Pull him up by 10% of his height
+                model.y = - (model.height * baseScale * 0.1); 
 
-                // Dragging logic
+                // Drag logic
                 model.interactive = true;
                 model.buttonMode = true;
                 let dragging = false;
@@ -75,10 +77,9 @@
                     modelStart.x = model.x;
                     modelStart.y = model.y;
                 });
-
+                
                 app.stage.interactive = true;
                 app.stage.hitArea = new PIXI.Rectangle(0, 0, innerWidth, innerHeight);
-                
                 app.stage.on('pointermove', (e) => {
                     if (dragging) {
                         model.x = modelStart.x + (e.data.global.x - dragStart.x);
@@ -91,7 +92,30 @@
                 app.stage.on('pointerup', () => dragging = false);
                 app.stage.on('pointerupoutside', () => dragging = false);
 
-                statusEl.innerText = 'Vega Online ✨ (Mouse to look, Drag to move)';
+                // ==========================================
+                // L I P S Y N C   M A G I C
+                // ==========================================
+                app.ticker.add(() => {
+                    if (isAudioPlaying && analyser && currentModel) {
+                        // Get audio volume
+                        analyser.getByteFrequencyData(dataArray);
+                        let sum = 0;
+                        for(let i = 0; i < dataArray.length; i++) {
+                            sum += dataArray[i];
+                        }
+                        let averageVolume = sum / dataArray.length;
+                        
+                        // Map volume (0-255) to Live2D Mouth Open Parameter (0.0 - 1.0)
+                        // Multiply by a factor to make it more sensitive
+                        let mouthOpen = (averageVolume / 255.0) * 2.5; 
+                        if(mouthOpen > 1.0) mouthOpen = 1.0;
+                        
+                        // Force set the Live2D parameter (ParamMouthOpenY is the standard param)
+                        currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", mouthOpen);
+                    }
+                });
+
+                statusEl.innerText = 'Vega Online ✨ (Lipsync Ready!)';
                 
                 window.addEventListener('resize', () => {
                     model.x = (innerWidth / 2) - ((model.width * model.scale.x) / 2);
@@ -103,7 +127,35 @@
             }
         }
 
-        // Control functions
+        window.startTalking = function() {
+            const audio = document.getElementById('testAudio');
+            
+            // Init AudioContext on first click (Browser policy requires user interaction)
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+                source = audioCtx.createMediaElementSource(audio);
+                source.connect(analyser);
+                analyser.connect(audioCtx.destination);
+                dataArray = new Uint8Array(analyser.frequencyBinCount);
+            }
+
+            if (audio.paused) {
+                audio.play();
+                isAudioPlaying = true;
+                document.getElementById('talkBtn').innerText = '⏹️ 停止语音';
+                document.getElementById('talkBtn').style.background = 'rgba(255,0,0,0.5)';
+            } else {
+                audio.pause();
+                isAudioPlaying = false;
+                document.getElementById('talkBtn').innerText = '🎤 播放测试语音 (Lipsync Test)';
+                document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
+                // Reset mouth to closed
+                if(currentModel) currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", 0);
+            }
+        };
+
         window.zoomIn = () => { if(currentModel) { currentModel.scale.set(currentModel.scale.x * 1.1); currentModel.x = (innerWidth / 2) - ((currentModel.width * currentModel.scale.x) / 2); } };
         window.zoomOut = () => { if(currentModel) { currentModel.scale.set(currentModel.scale.x * 0.9); currentModel.x = (innerWidth / 2) - ((currentModel.width * currentModel.scale.x) / 2); } };
         window.moveUp = () => { if(currentModel) currentModel.y -= 50; };
