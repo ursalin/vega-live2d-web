@@ -20,7 +20,7 @@
 <body>
     <div id="status">Loading Vega's Shell...</div>
     <div id="controls">
-        <button id="talkBtn" onclick="startTalking()">🎤 播放测试语音 (Lipsync Test)</button>
+        <button id="talkBtn" onclick="startTalking()">🎤 播放测试人声 (Human Voice Lipsync)</button>
         <button onclick="zoomOut()">🔍 Zoom Out</button>
         <button onclick="zoomIn()">🔎 Zoom In</button>
         <button onclick="moveUp()">⬆️ Up</button>
@@ -28,8 +28,8 @@
     </div>
     <canvas id="canvas"></canvas>
     
-    <!-- Changed to a reliable CORS-friendly audio source -->
-    <audio id="testAudio" src="https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" crossorigin="anonymous"></audio>
+    <!-- Changed to a human voice file (Eleanor Roosevelt speech snippet) -->
+    <audio id="testAudio" src="https://upload.wikimedia.org/wikipedia/commons/e/ec/Eleanor_Roosevelt_speech_on_human_rights_%281948%29.ogg" crossorigin="anonymous"></audio>
 
     <script>
         const app = new PIXI.Application({
@@ -48,6 +48,9 @@
         let audioCtx, analyser, source;
         let dataArray;
         let isAudioPlaying = false;
+        
+        // Smoothing variable
+        let currentMouthOpen = 0;
 
         async function init() {
             try {
@@ -61,11 +64,6 @@
                 model.scale.set(baseScale);
                 model.x = (innerWidth / 2) - ((model.width * baseScale) / 2);
                 model.y = - (model.height * baseScale * 0.1); 
-
-                // Let's explicitly unlock the mouth parameter just in case physics/idle is locking it
-                if(currentModel.internalModel.coreModel) {
-                    console.log("Model parameters loaded.");
-                }
 
                 model.interactive = true;
                 model.buttonMode = true;
@@ -96,31 +94,33 @@
                 app.stage.on('pointerupoutside', () => dragging = false);
 
                 // ==========================================
-                // L I P S Y N C   M A G I C
+                // SMOOTH HUMAN LIPSYNC
                 // ==========================================
                 app.ticker.add(() => {
                     if (isAudioPlaying && analyser && currentModel) {
                         analyser.getByteFrequencyData(dataArray);
                         let sum = 0;
-                        // Focus on human voice frequencies (lower half of spectrum)
+                        // Focus on human voice frequencies
                         let limit = Math.floor(dataArray.length / 2);
                         for(let i = 0; i < limit; i++) {
                             sum += dataArray[i];
                         }
                         let averageVolume = sum / limit;
                         
-                        // Increase multiplier significantly to force movement
-                        let mouthOpen = (averageVolume / 255.0) * 4.0; 
-                        if(mouthOpen > 1.0) mouthOpen = 1.0;
-                        if(mouthOpen < 0.1) mouthOpen = 0.0;
+                        // Calculate target mouth openness based on human voice volume
+                        let targetMouthOpen = (averageVolume / 200.0) * 2.0; 
+                        if(targetMouthOpen > 1.0) targetMouthOpen = 1.0;
+                        if(targetMouthOpen < 0.1) targetMouthOpen = 0.0;
                         
-                        // Force set multiple common mouth parameters just in case
-                        currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", mouthOpen);
-                        currentModel.internalModel.coreModel.setParameterValueById("ParamMouthForm", mouthOpen); 
+                        // LERP (Linear Interpolation) for smoothing
+                        // This makes the mouth open and close smoothly like real muscles
+                        currentMouthOpen = currentMouthOpen + (targetMouthOpen - currentMouthOpen) * 0.3;
+                        
+                        currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", currentMouthOpen);
                     }
                 });
 
-                statusEl.innerText = 'Vega Online ✨ (Lipsync Ready!)';
+                statusEl.innerText = 'Vega Online ✨ (Human Lipsync Ready!)';
                 
                 window.addEventListener('resize', () => {
                     model.x = (innerWidth / 2) - ((model.width * model.scale.x) / 2);
@@ -161,11 +161,11 @@
                 audio.pause();
                 audio.currentTime = 0;
                 isAudioPlaying = false;
-                document.getElementById('talkBtn').innerText = '🎤 播放测试语音 (Lipsync Test)';
+                currentMouthOpen = 0;
+                document.getElementById('talkBtn').innerText = '🎤 播放测试人声 (Human Voice Lipsync)';
                 document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
                 if(currentModel) {
                     currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", 0);
-                    currentModel.internalModel.coreModel.setParameterValueById("ParamMouthForm", 0);
                 }
             }
         };
