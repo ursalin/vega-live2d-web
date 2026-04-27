@@ -28,8 +28,8 @@
     </div>
     <canvas id="canvas"></canvas>
     
-    <!-- A sample TTS audio file -->
-    <audio id="testAudio" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" crossorigin="anonymous"></audio>
+    <!-- Changed to a reliable CORS-friendly audio source -->
+    <audio id="testAudio" src="https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" crossorigin="anonymous"></audio>
 
     <script>
         const app = new PIXI.Application({
@@ -45,7 +45,6 @@
         let currentModel = null;
         let baseScale = 1;
         
-        // Audio Context variables
         let audioCtx, analyser, source;
         let dataArray;
         let isAudioPlaying = false;
@@ -63,7 +62,11 @@
                 model.x = (innerWidth / 2) - ((model.width * baseScale) / 2);
                 model.y = - (model.height * baseScale * 0.1); 
 
-                // Drag logic
+                // Let's explicitly unlock the mouth parameter just in case physics/idle is locking it
+                if(currentModel.internalModel.coreModel) {
+                    console.log("Model parameters loaded.");
+                }
+
                 model.interactive = true;
                 model.buttonMode = true;
                 let dragging = false;
@@ -97,21 +100,23 @@
                 // ==========================================
                 app.ticker.add(() => {
                     if (isAudioPlaying && analyser && currentModel) {
-                        // Get audio volume
                         analyser.getByteFrequencyData(dataArray);
                         let sum = 0;
-                        for(let i = 0; i < dataArray.length; i++) {
+                        // Focus on human voice frequencies (lower half of spectrum)
+                        let limit = Math.floor(dataArray.length / 2);
+                        for(let i = 0; i < limit; i++) {
                             sum += dataArray[i];
                         }
-                        let averageVolume = sum / dataArray.length;
+                        let averageVolume = sum / limit;
                         
-                        // Map volume (0-255) to Live2D Mouth Open Parameter (0.0 - 1.0)
-                        // Multiply by a factor to make it more sensitive
-                        let mouthOpen = (averageVolume / 255.0) * 2.5; 
+                        // Increase multiplier significantly to force movement
+                        let mouthOpen = (averageVolume / 255.0) * 4.0; 
                         if(mouthOpen > 1.0) mouthOpen = 1.0;
+                        if(mouthOpen < 0.1) mouthOpen = 0.0;
                         
-                        // Force set the Live2D parameter (ParamMouthOpenY is the standard param)
+                        // Force set multiple common mouth parameters just in case
                         currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", mouthOpen);
+                        currentModel.internalModel.coreModel.setParameterValueById("ParamMouthForm", mouthOpen); 
                     }
                 });
 
@@ -130,7 +135,6 @@
         window.startTalking = function() {
             const audio = document.getElementById('testAudio');
             
-            // Init AudioContext on first click (Browser policy requires user interaction)
             if (!audioCtx) {
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 analyser = audioCtx.createAnalyser();
@@ -141,18 +145,28 @@
                 dataArray = new Uint8Array(analyser.frequencyBinCount);
             }
 
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+
             if (audio.paused) {
-                audio.play();
-                isAudioPlaying = true;
-                document.getElementById('talkBtn').innerText = '⏹️ 停止语音';
-                document.getElementById('talkBtn').style.background = 'rgba(255,0,0,0.5)';
+                audio.play().then(() => {
+                    isAudioPlaying = true;
+                    document.getElementById('talkBtn').innerText = '⏹️ 停止语音';
+                    document.getElementById('talkBtn').style.background = 'rgba(255,0,0,0.5)';
+                }).catch(e => {
+                    statusEl.innerText = 'Audio Play Error: ' + e.message;
+                });
             } else {
                 audio.pause();
+                audio.currentTime = 0;
                 isAudioPlaying = false;
                 document.getElementById('talkBtn').innerText = '🎤 播放测试语音 (Lipsync Test)';
                 document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
-                // Reset mouth to closed
-                if(currentModel) currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", 0);
+                if(currentModel) {
+                    currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", 0);
+                    currentModel.internalModel.coreModel.setParameterValueById("ParamMouthForm", 0);
+                }
             }
         };
 
