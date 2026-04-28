@@ -123,12 +123,12 @@
                         // Smoother transition
                         currentMouthOpen = currentMouthOpen + (targetMouthOpen - currentMouthOpen) * 0.4;
                         
-                        currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", currentMouthOpen);
+                        model.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", currentMouthOpen);
                         
                         // 🎯 GAZE LOCK: Look at user (center) when speaking
                         const centerX = innerWidth / 2;
                         const centerY = innerHeight / 2;
-                        currentModel.focus(centerX, centerY);
+                        model.focus(centerX, centerY);
                     }
                 });
 
