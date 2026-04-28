@@ -126,9 +126,11 @@
                         model.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", currentMouthOpen);
                         
                         // 🎯 GAZE LOCK: Look at user (center) when speaking
-                        const centerX = innerWidth / 2;
-                        const centerY = innerHeight / 2;
-                        model.focus(centerX, centerY);
+                        // Reset gaze to center (0,0 = looking straight)
+                        model.internalModel.coreModel.setParameterValueById("ParamAngleX", 0);
+                        model.internalModel.coreModel.setParameterValueById("ParamAngleY", 0);
+                        model.internalModel.coreModel.setParameterValueById("ParamEyeBallX", 0);
+                        model.internalModel.coreModel.setParameterValueById("ParamEyeBallY", 0);
                     }
                 });
 
