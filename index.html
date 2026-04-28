@@ -92,8 +92,11 @@
                 app.stage.on('pointerupoutside', () => dragging = false);
 
                 // ==========================================
-                // AGGRESSIVE SMOOTH HUMAN LIPSYNC
+                // NATURAL HUMAN LIPSYNC + GAZE LOCK
                 // ==========================================
+                let mouthFlutter = 0;
+                let flutterSpeed = 0.15;
+                
                 app.ticker.add(() => {
                     if (isAudioPlaying && analyser && currentModel) {
                         analyser.getByteFrequencyData(dataArray);
@@ -103,16 +106,28 @@
                         }
                         let averageVolume = sum / dataArray.length;
                         
-                        // Extremely sensitive multiplier (x6.0) to ensure it opens even for quiet audio
+                        // Sensitive multiplier
                         let targetMouthOpen = (averageVolume / 255.0) * 6.0; 
                         
                         if(targetMouthOpen > 1.0) targetMouthOpen = 1.0;
                         if(targetMouthOpen < 0.1) targetMouthOpen = 0.0;
                         
+                        // Add natural flutter (微小随机波动)
+                        mouthFlutter += flutterSpeed;
+                        let flutter = Math.sin(mouthFlutter) * 0.08 + Math.random() * 0.05;
+                        targetMouthOpen += flutter;
+                        if(targetMouthOpen > 1.0) targetMouthOpen = 1.0;
+                        if(targetMouthOpen < 0.0) targetMouthOpen = 0.0;
+                        
                         // Smoother transition
                         currentMouthOpen = currentMouthOpen + (targetMouthOpen - currentMouthOpen) * 0.4;
                         
                         currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", currentMouthOpen);
+                        
+                        // 🎯 GAZE LOCK: Look at user (center) when speaking
+                        const centerX = innerWidth / 2;
+                        const centerY = innerHeight / 2;
+                        currentModel.focus(centerX, centerY);
                     }
                 });
 
