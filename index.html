@@ -83,7 +83,8 @@
                     if (dragging) {
                         model.x = modelStart.x + (e.data.global.x - dragStart.x);
                         model.y = modelStart.y + (e.data.global.y - dragStart.y);
-                    } else {
+                    } else if (!isAudioPlaying) {
+                        // Only follow mouse when NOT speaking
                         model.focus(e.data.global.x, e.data.global.y);
                     }
                 });
