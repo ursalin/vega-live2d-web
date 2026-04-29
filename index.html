@@ -160,14 +160,13 @@
                     setParam(core, 'ParamMouthForm',  mouthFormSmooth);
 
                     // ---------- Gaze ----------
-                    // While speaking, lock onto the viewer (target 0).
-                    // When idle: follow the cursor if it moved recently, otherwise drift
-                    // gently left/right so she feels alive instead of frozen.
+                    // Speaking: lock to center (viewer).
+                    // Not speaking: follow the mouse at its last known position.
+                    //   If the page just loaded and mouse was never moved, do idle sway instead.
                     let targetAngleX = 0, targetAngleY = 0, targetEyeX = 0, targetEyeY = 0;
-                    const idleSinceMove = (now - lastMouseMoveAt) / 1000;
                     if (!isAudioPlaying) {
-                        if (lastMouseMoveAt > 0 && idleSinceMove < 1.5) {
-                            // Cursor follow
+                        if (lastMouseMoveAt > 0) {
+                            // Always follow the last known mouse position — no timeout.
                             const nx = (mouseX / innerWidth)  * 2 - 1;
                             const ny = (mouseY / innerHeight) * 2 - 1;
                             targetAngleX =  nx * 22;
@@ -175,7 +174,7 @@
                             targetEyeX   =  nx * 0.7;
                             targetEyeY   = -ny * 0.7;
                         } else {
-                            // Idle sway — two detuned sines feel less mechanical than one.
+                            // No mouse input yet — gentle idle sway so she doesn't freeze.
                             const swayX = Math.sin(now * 0.00055) * 7 + Math.sin(now * 0.00097) * 3;
                             const swayY = Math.sin(now * 0.00078) * 2.5;
                             targetAngleX = swayX;
@@ -193,14 +192,18 @@
                     gazeEyeX   += (targetEyeX   - gazeEyeX)   * gk;
                     gazeEyeY   += (targetEyeY   - gazeEyeY)   * gk;
 
-                    setParam(core, 'ParamAngleX',    gazeAngleX);
-                    setParam(core, 'ParamAngleY',    gazeAngleY);
-                    setParam(core, 'ParamAngleZ',    gazeAngleX * 0.3);
-                    setParam(core, 'ParamEyeBallX',  gazeEyeX);
-                    setParam(core, 'ParamEyeBallY',  gazeEyeY);
-                    setParam(core, 'ParamBodyAngleX', gazeAngleX * 0.4);
-                    setParam(core, 'ParamBodyAngleY', gazeAngleY * 0.3);
-                    setParam(core, 'ParamBodyAngleZ', gazeAngleX * 0.15);
+                    // Body lags behind head with a larger ratio when idle so arms get
+                    // physically dragged along — the bigger the body sway the more the
+                    // physics engine carries the sleeves and hands.
+                    const bodyMult = isAudioPlaying ? 0.3 : 0.55;
+                    setParam(core, 'ParamAngleX',     gazeAngleX);
+                    setParam(core, 'ParamAngleY',     gazeAngleY);
+                    setParam(core, 'ParamAngleZ',     gazeAngleX * 0.25);
+                    setParam(core, 'ParamEyeBallX',   gazeEyeX);
+                    setParam(core, 'ParamEyeBallY',   gazeEyeY);
+                    setParam(core, 'ParamBodyAngleX', gazeAngleX * bodyMult);
+                    setParam(core, 'ParamBodyAngleY', gazeAngleY * (bodyMult * 0.6));
+                    setParam(core, 'ParamBodyAngleZ', gazeAngleX * 0.12);
 
                     // ---------- Blink ----------
                     if (blinkPhase === 'idle' && now >= nextBlinkAt) {
