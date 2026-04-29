@@ -98,19 +98,26 @@
                     modelStart.x = model.x;
                     modelStart.y = model.y;
                 });
-                
+
+                const recordLookAt = (e) => {
+                    mouseX = e.data.global.x;
+                    mouseY = e.data.global.y;
+                    lastMouseMoveAt = performance.now();
+                };
+
                 app.stage.interactive = true;
                 app.stage.hitArea = new PIXI.Rectangle(0, 0, innerWidth, innerHeight);
+                // Both move and click/tap update the look-at target so it works on touch too.
                 app.stage.on('pointermove', (e) => {
                     if (dragging) {
                         model.x = modelStart.x + (e.data.global.x - dragStart.x);
                         model.y = modelStart.y + (e.data.global.y - dragStart.y);
                     } else {
-                        mouseX = e.data.global.x;
-                        mouseY = e.data.global.y;
-                        lastMouseMoveAt = performance.now();
+                        recordLookAt(e);
                     }
                 });
+                app.stage.on('pointerdown', recordLookAt);
+                app.stage.on('pointertap', recordLookAt);
 
                 app.stage.on('pointerup', () => dragging = false);
                 app.stage.on('pointerupoutside', () => dragging = false);
@@ -166,13 +173,13 @@
                     let targetAngleX = 0, targetAngleY = 0, targetEyeX = 0, targetEyeY = 0;
                     if (!isAudioPlaying) {
                         if (lastMouseMoveAt > 0) {
-                            // Always follow the last known mouse position — no timeout.
+                            // Always follow the last known pointer position — no timeout.
                             const nx = (mouseX / innerWidth)  * 2 - 1;
                             const ny = (mouseY / innerHeight) * 2 - 1;
-                            targetAngleX =  nx * 22;
-                            targetAngleY = -ny * 18;
-                            targetEyeX   =  nx * 0.7;
-                            targetEyeY   = -ny * 0.7;
+                            targetAngleX =  nx * 28;
+                            targetAngleY = -ny * 24;
+                            targetEyeX   =  nx * 1.0;
+                            targetEyeY   = -ny * 1.0;
                         } else {
                             // No mouse input yet — gentle idle sway so she doesn't freeze.
                             const swayX = Math.sin(now * 0.00055) * 7 + Math.sin(now * 0.00097) * 3;
@@ -195,7 +202,7 @@
                     // Body lags behind head with a larger ratio when idle so arms get
                     // physically dragged along — the bigger the body sway the more the
                     // physics engine carries the sleeves and hands.
-                    const bodyMult = isAudioPlaying ? 0.3 : 0.55;
+                    const bodyMult = isAudioPlaying ? 0.3 : 0.7;
                     setParam(core, 'ParamAngleX',     gazeAngleX);
                     setParam(core, 'ParamAngleY',     gazeAngleY);
                     setParam(core, 'ParamAngleZ',     gazeAngleX * 0.25);
