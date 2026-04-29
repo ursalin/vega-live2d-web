@@ -44,11 +44,32 @@
         const statusEl = document.getElementById('status');
         let currentModel = null;
         let baseScale = 1;
-        
+
+        // Audio analysis
         let audioCtx, analyser, source;
         let dataArray;
         let isAudioPlaying = false;
-        let currentMouthOpen = 0;
+
+        // Smoothed animation state
+        let mouthEnvelope = 0;     // post attack/release
+        let mouthFormSmooth = 0;
+        let gazeAngleX = 0, gazeAngleY = 0;
+        let gazeEyeX = 0,   gazeEyeY = 0;
+        let mouseX = 0, mouseY = 0;
+        let lastMouseMoveAt = 0;
+
+        // Blink state machine
+        let blinkValue = 1;
+        let blinkPhase = 'idle';   // 'idle' | 'closing' | 'opening'
+        let blinkPhaseStart = 0;
+        let nextBlinkAt = performance.now() + 1500;
+
+        // Breath
+        let breathPhase = 0;
+
+        function setParam(core, id, v) {
+            try { core.setParameterValueById(id, v); } catch (e) { /* param may not exist */ }
+        }
 
         async function init() {
             try {
@@ -83,55 +104,117 @@
                     if (dragging) {
                         model.x = modelStart.x + (e.data.global.x - dragStart.x);
                         model.y = modelStart.y + (e.data.global.y - dragStart.y);
-                    } else if (!isAudioPlaying) {
-                        // Only follow mouse when NOT speaking
-                        model.focus(e.data.global.x, e.data.global.y);
+                    } else {
+                        mouseX = e.data.global.x;
+                        mouseY = e.data.global.y;
+                        lastMouseMoveAt = performance.now();
                     }
                 });
 
                 app.stage.on('pointerup', () => dragging = false);
                 app.stage.on('pointerupoutside', () => dragging = false);
 
+                // Disable the library's built-in focus tracker — we drive gaze ourselves
+                // so it can be smoothly recentered while speaking.
+                if (model.internalModel.focusController) {
+                    const fc = model.internalModel.focusController;
+                    fc.focus = function () {};
+                }
+
                 // ==========================================
-                // NATURAL HUMAN LIPSYNC + GAZE LOCK
+                // NATURAL LIPSYNC + GAZE + BLINK + BREATH
                 // ==========================================
-                let mouthFlutter = 0;
-                let flutterSpeed = 0.15;
-                
                 app.ticker.add(() => {
-                    if (isAudioPlaying && analyser && currentModel) {
+                    if (!currentModel) return;
+                    const core = currentModel.internalModel.coreModel;
+                    const now = performance.now();
+                    const dt = Math.min(0.05, app.ticker.deltaMS / 1000);
+
+                    // ---------- Lipsync envelope ----------
+                    let target = 0;
+                    if (isAudioPlaying && analyser) {
                         analyser.getByteFrequencyData(dataArray);
-                        let sum = 0;
-                        for(let i = 0; i < dataArray.length; i++) {
+                        // Speech band: with sampleRate 44100 & fftSize 256, each bin ≈ 172Hz.
+                        // Bins 1..22 cover ~170Hz–3800Hz, where vowels/consonants live.
+                        let sum = 0, count = 0;
+                        for (let i = 1; i < 22 && i < dataArray.length; i++) {
                             sum += dataArray[i];
+                            count++;
                         }
-                        let averageVolume = sum / dataArray.length;
-                        
-                        // Sensitive multiplier
-                        let targetMouthOpen = (averageVolume / 255.0) * 6.0; 
-                        
-                        if(targetMouthOpen > 1.0) targetMouthOpen = 1.0;
-                        if(targetMouthOpen < 0.1) targetMouthOpen = 0.0;
-                        
-                        // Add natural flutter (微小随机波动)
-                        mouthFlutter += flutterSpeed;
-                        let flutter = Math.sin(mouthFlutter) * 0.08 + Math.random() * 0.05;
-                        targetMouthOpen += flutter;
-                        if(targetMouthOpen > 1.0) targetMouthOpen = 1.0;
-                        if(targetMouthOpen < 0.0) targetMouthOpen = 0.0;
-                        
-                        // Smoother transition
-                        currentMouthOpen = currentMouthOpen + (targetMouthOpen - currentMouthOpen) * 0.4;
-                        
-                        model.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", currentMouthOpen);
-                        
-                        // 🎯 GAZE LOCK: Look at user (center) when speaking
-                        // Reset gaze to center (0,0 = looking straight)
-                        model.internalModel.coreModel.setParameterValueById("ParamAngleX", 0);
-                        model.internalModel.coreModel.setParameterValueById("ParamAngleY", 0);
-                        model.internalModel.coreModel.setParameterValueById("ParamEyeBallX", 0);
-                        model.internalModel.coreModel.setParameterValueById("ParamEyeBallY", 0);
+                        const avg = (sum / count) / 255;
+                        target = Math.min(1, Math.max(0, (avg - 0.04) * 2.6));
                     }
+                    // Asymmetric envelope: open quickly, close slowly — like real jaws.
+                    const rising = target > mouthEnvelope;
+                    const k = 1 - Math.exp(-dt / (rising ? 0.035 : 0.085));
+                    mouthEnvelope += (target - mouthEnvelope) * k;
+
+                    // Drive jaw + mouth together, with a subtle vowel-shape variation.
+                    const formNoise = (Math.sin(now * 0.011) * 0.6 + Math.sin(now * 0.027) * 0.4);
+                    const formTarget = mouthEnvelope > 0.08 ? formNoise * 0.25 : 0;
+                    mouthFormSmooth += (formTarget - mouthFormSmooth) * 0.08;
+
+                    setParam(core, 'ParamMouthOpenY', mouthEnvelope);
+                    setParam(core, 'ParamJawOpen',    mouthEnvelope * 0.6);
+                    setParam(core, 'ParamMouthForm',  mouthFormSmooth);
+
+                    // ---------- Gaze ----------
+                    // While speaking, recenter on the viewer. When idle, follow the cursor;
+                    // if the cursor has been still for >1.5s, gently drift back to center.
+                    let targetAngleX = 0, targetAngleY = 0, targetEyeX = 0, targetEyeY = 0;
+                    const idleSinceMove = (now - lastMouseMoveAt) / 1000;
+                    if (!isAudioPlaying && lastMouseMoveAt > 0 && idleSinceMove < 1.5) {
+                        const nx = (mouseX / innerWidth)  * 2 - 1;   // -1..1
+                        const ny = (mouseY / innerHeight) * 2 - 1;
+                        targetAngleX =  nx * 22;
+                        targetAngleY = -ny * 18;
+                        targetEyeX   =  nx * 0.7;
+                        targetEyeY   = -ny * 0.7;
+                    }
+
+                    // One-pole smoothing — speaking pulls back faster so she snaps to viewer.
+                    const gazeTau = isAudioPlaying ? 0.18 : 0.12;
+                    const gk = 1 - Math.exp(-dt / gazeTau);
+                    gazeAngleX += (targetAngleX - gazeAngleX) * gk;
+                    gazeAngleY += (targetAngleY - gazeAngleY) * gk;
+                    gazeEyeX   += (targetEyeX   - gazeEyeX)   * gk;
+                    gazeEyeY   += (targetEyeY   - gazeEyeY)   * gk;
+
+                    setParam(core, 'ParamAngleX',    gazeAngleX);
+                    setParam(core, 'ParamAngleY',    gazeAngleY);
+                    setParam(core, 'ParamAngleZ',    gazeAngleX * 0.3);
+                    setParam(core, 'ParamEyeBallX',  gazeEyeX);
+                    setParam(core, 'ParamEyeBallY',  gazeEyeY);
+                    setParam(core, 'ParamBodyAngleX', gazeAngleX * 0.4);
+                    setParam(core, 'ParamBodyAngleY', gazeAngleY * 0.3);
+                    setParam(core, 'ParamBodyAngleZ', gazeAngleX * 0.15);
+
+                    // ---------- Blink ----------
+                    if (blinkPhase === 'idle' && now >= nextBlinkAt) {
+                        blinkPhase = 'closing';
+                        blinkPhaseStart = now;
+                    }
+                    if (blinkPhase === 'closing') {
+                        const t = (now - blinkPhaseStart) / 80;
+                        blinkValue = Math.max(0, 1 - t);
+                        if (t >= 1) { blinkPhase = 'opening'; blinkPhaseStart = now; }
+                    } else if (blinkPhase === 'opening') {
+                        const t = (now - blinkPhaseStart) / 120;
+                        blinkValue = Math.min(1, t);
+                        if (t >= 1) {
+                            blinkPhase = 'idle';
+                            blinkValue = 1;
+                            // Occasional double-blink for life
+                            const doubleBlink = Math.random() < 0.12;
+                            nextBlinkAt = now + (doubleBlink ? 180 : 2500 + Math.random() * 3500);
+                        }
+                    }
+                    setParam(core, 'ParamEyeLOpen', blinkValue);
+                    setParam(core, 'ParamEyeROpen', blinkValue);
+
+                    // ---------- Breath ----------
+                    breathPhase += dt * 1.1;
+                    setParam(core, 'ParamBreath', Math.sin(breathPhase) * 0.5 + 0.5);
                 });
 
                 statusEl.innerText = 'Vega Online ✨ (Lipsync Ready!)';
@@ -163,6 +246,12 @@
                 audioCtx.resume();
             }
 
+            audio.onended = () => {
+                isAudioPlaying = false;
+                document.getElementById('talkBtn').innerText = '🎤 播放测试人声 (Human Lipsync)';
+                document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
+            };
+
             if (audio.paused) {
                 audio.play().then(() => {
                     isAudioPlaying = true;
@@ -175,12 +264,9 @@
                 audio.pause();
                 audio.currentTime = 0;
                 isAudioPlaying = false;
-                currentMouthOpen = 0;
                 document.getElementById('talkBtn').innerText = '🎤 播放测试人声 (Human Lipsync)';
                 document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
-                if(currentModel) {
-                    currentModel.internalModel.coreModel.setParameterValueById("ParamMouthOpenY", 0);
-                }
+                // Mouth envelope, gaze, etc. all release naturally in the ticker.
             }
         };
 
