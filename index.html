@@ -66,6 +66,7 @@
 
         // Breath
         let breathPhase = 0;
+        let breathAmp = 0.5;
 
         function setParam(core, id, v) {
             try { core.setParameterValueById(id, v); } catch (e) { /* param may not exist */ }
@@ -213,8 +214,12 @@
                     setParam(core, 'ParamEyeROpen', blinkValue);
 
                     // ---------- Breath ----------
+                    // Collapse amplitude while speaking so physics-driven head sway
+                    // doesn't pull the gaze off-center. Smooth transition in/out.
+                    const breathAmpTarget = isAudioPlaying ? 0.04 : 0.5;
+                    breathAmp += (breathAmpTarget - breathAmp) * (1 - Math.exp(-dt / 0.4));
                     breathPhase += dt * 1.1;
-                    setParam(core, 'ParamBreath', Math.sin(breathPhase) * 0.5 + 0.5);
+                    setParam(core, 'ParamBreath', Math.sin(breathPhase) * breathAmp + 0.5);
                 });
 
                 statusEl.innerText = 'Vega Online ✨ (Lipsync Ready!)';
