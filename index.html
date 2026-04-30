@@ -1,308 +1,332 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Vega - Live2D Lipsync Test</title>
-    <style>
-        body { margin: 0; padding: 0; background-color: #2c2c2c; overflow: hidden; width: 100vw; height: 100vh; }
-        canvas { display: block; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
-        #status { position: absolute; top: 10px; left: 10px; color: #fff; font-family: monospace; z-index: 999;}
-        #controls { position: absolute; bottom: 20px; left: 10px; color: #fff; font-family: monospace; z-index: 999; display: flex; gap: 10px; flex-wrap: wrap; width: 90vw;}
-        button { background: rgba(0,0,0,0.7); color: #0f0; border: 1px solid #0f0; padding: 10px 15px; cursor: pointer; border-radius: 4px; font-weight: bold;}
-        button:hover { background: rgba(0,255,0,0.2); }
-        audio { display: none; }
-    </style>
-    <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Vega</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: #1a1a2e; overflow: hidden; width: 100vw; height: 100vh; font-family: monospace; }
+    canvas { display: block; position: absolute; inset: 0; width: 100%; height: 100%; }
+
+    /* ── Top bar ── */
+    #topbar {
+      position: absolute; top: 0; left: 0; right: 0; height: 44px;
+      display: flex; align-items: center; padding: 0 10px; gap: 8px;
+      background: linear-gradient(#0006, transparent); z-index: 100; pointer-events: none;
+    }
+    #status { color: #aef; font-size: 12px; flex: 1; pointer-events: none; }
+    #topbar button { pointer-events: all; background: rgba(0,0,0,.55); color: #0f0;
+      border: 1px solid #0f04; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 16px; }
+    #topbar button:hover { background: rgba(0,255,0,.15); }
+    #cameraFlipBtn { display: none; }
+
+    /* ── Camera PiP ── */
+    #cameraPip {
+      display: none; position: absolute; top: 52px; right: 10px;
+      width: 160px; height: 120px; border-radius: 10px; overflow: hidden;
+      border: 1px solid #0f04; z-index: 100; background: #000;
+    }
+    #cameraPreview { width: 100%; height: 100%; object-fit: cover; }
+
+    /* ── Chat history ── */
+    #chatHistory {
+      display: none; position: absolute; bottom: 70px; left: 0; right: 0;
+      max-height: 40vh; overflow-y: auto; padding: 8px 12px;
+      display: flex; flex-direction: column; gap: 6px; z-index: 100;
+      pointer-events: none;
+    }
+    .bubble { max-width: 75%; padding: 8px 12px; border-radius: 14px;
+      font-size: 13px; line-height: 1.45; word-break: break-word; pointer-events: all; }
+    .bubble-user      { align-self: flex-end; background: #0f3460; color: #ddf; border-bottom-right-radius: 4px; }
+    .bubble-assistant { align-self: flex-start; background: #533483; color: #ffe; border-bottom-left-radius: 4px; }
+    .bubble-system    { align-self: center; background: #2a2a2a; color: #f88; font-size: 11px; border-radius: 8px; padding: 4px 10px; }
+
+    /* ── Chat bar ── */
+    #chatBar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: flex-end; gap: 6px;
+      padding: 8px 10px 10px; background: linear-gradient(transparent, #0009 60%);
+    }
+    #chatInput {
+      flex: 1; resize: none; background: rgba(0,0,0,.6); color: #eef;
+      border: 1px solid #0f04; border-radius: 10px; padding: 8px 12px;
+      font-size: 14px; font-family: monospace; outline: none; min-height: 38px; max-height: 120px;
+    }
+    #chatInput::placeholder { color: #558; }
+    #chatBar button {
+      background: rgba(0,0,0,.65); color: #0f0; border: 1px solid #0f04;
+      border-radius: 8px; padding: 8px 14px; cursor: pointer; font-size: 18px; flex-shrink: 0;
+    }
+    #chatBar button:hover  { background: rgba(0,255,0,.18); }
+    #chatBar button:disabled { opacity: .4; cursor: default; }
+    #snapBtn { display: none; font-size: 16px; }
+    #snapBtn.snapped { background: rgba(255,160,0,.35); color: #fa0; border-color: #fa0; }
+
+    /* ── Dev controls (collapsed) ── */
+    #devToggle {
+      position: absolute; bottom: 10px; right: 10px; z-index: 200;
+      font-size: 11px; color: #555; cursor: pointer; background: none; border: none;
+    }
+    #devControls {
+      display: none; position: absolute; bottom: 30px; right: 10px; z-index: 200;
+      display: flex; flex-direction: column; gap: 4px; align-items: flex-end;
+    }
+    #devControls button {
+      background: rgba(0,0,0,.7); color: #0f0; border: 1px solid #0f0;
+      padding: 5px 10px; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 12px;
+    }
+
+    /* ── Settings drawer ── */
+    #settingsPanel {
+      position: fixed; top: 0; right: -100%; width: min(360px, 100vw); height: 100vh;
+      background: #16213e; color: #cce; z-index: 300; transition: right .28s ease;
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    #settingsPanel.open { right: 0; }
+    .sp-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px; background: #0f3460; font-size: 15px; font-weight: bold;
+    }
+    .sp-header button { background: none; border: none; color: #aef; font-size: 18px; cursor: pointer; }
+    .sp-body { flex: 1; overflow-y: auto; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px; }
+    .sp-body label { font-size: 12px; color: #8af; margin-top: 4px; }
+    .sp-body input, .sp-body select, .sp-body textarea {
+      background: #0d1b2a; color: #ddf; border: 1px solid #0f34; border-radius: 6px;
+      padding: 6px 8px; font-size: 13px; width: 100%; font-family: monospace;
+    }
+    .sp-body input[type=checkbox] { width: auto; }
+    .sp-body input[type=range]    { padding: 0; }
+    .sp-section { font-size: 13px; font-weight: bold; color: #6af; padding: 8px 0 2px; border-top: 1px solid #0f34; }
+    .sp-save-btn {
+      margin-top: 16px; padding: 10px; background: #0f3460; color: #0f0;
+      border: 1px solid #0f0; border-radius: 8px; cursor: pointer; font-size: 14px;
+    }
+    .sp-save-btn:hover { background: rgba(0,255,0,.15); }
+  </style>
+
+  <script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi.js@6.5.2/dist/browser/pixi.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display/dist/cubism4.min.js"></script>
 </head>
 <body>
-    <div id="status">Loading Vega's Shell...</div>
-    <div id="controls">
-        <button id="talkBtn" onclick="startTalking()">🎤 播放测试人声 (Human Lipsync)</button>
-        <button onclick="zoomOut()">🔍 Zoom Out</button>
-        <button onclick="zoomIn()">🔎 Zoom In</button>
-        <button onclick="moveUp()">⬆️ Up</button>
-        <button onclick="moveDown()">⬇️ Down</button>
-    </div>
-    <canvas id="canvas"></canvas>
-    
-    <!-- Using a very loud and clear audio source to ensure high amplitude -->
-    <audio id="testAudio" src="https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" crossorigin="anonymous"></audio>
 
-    <script>
-        const app = new PIXI.Application({
-            view: document.getElementById('canvas'),
-            autoStart: true,
-            resizeTo: window,
-            backgroundColor: 0x2c2c2c,
-            resolution: window.devicePixelRatio || 1,
-            autoDensity: true
-        });
+<div id="topbar">
+  <span id="status">Loading Vega...</span>
+  <button id="cameraBtn"    onclick="toggleCamera()">📷</button>
+  <button id="cameraFlipBtn" onclick="flipCamera()">🔄</button>
+  <button onclick="openSettings()">⚙️</button>
+</div>
 
-        const statusEl = document.getElementById('status');
-        let currentModel = null;
-        let baseScale = 1;
+<div id="cameraPip"><video id="cameraPreview" muted playsinline></video></div>
 
-        // Audio analysis
-        let audioCtx, analyser, source;
-        let dataArray;
-        let isAudioPlaying = false;
+<canvas id="canvas"></canvas>
 
-        // Smoothed animation state
-        let mouthEnvelope = 0;     // post attack/release
-        let mouthFormSmooth = 0;
-        let gazeAngleX = 0, gazeAngleY = 0;
-        let gazeEyeX = 0,   gazeEyeY = 0;
-        let mouseX = 0, mouseY = 0;
-        let lastMouseMoveAt = 0;
+<div id="chatHistory"></div>
 
-        // Blink state machine
-        let blinkValue = 1;
-        let blinkPhase = 'idle';   // 'idle' | 'closing' | 'opening'
-        let blinkPhaseStart = 0;
-        let nextBlinkAt = performance.now() + 1500;
+<div id="chatBar">
+  <button id="snapBtn" onclick="toggleSnap()" title="附上当前画面">📸</button>
+  <textarea id="chatInput" placeholder="和 Vega 说点什么…" rows="1"></textarea>
+  <button id="sendBtn" onclick="sendMessage()">↑</button>
+</div>
+
+<button id="devToggle" onclick="document.getElementById('devControls').style.display=document.getElementById('devControls').style.display==='flex'?'none':'flex'">DEV</button>
+<div id="devControls" style="display:none">
+  <button onclick="startTalking()">🎤 测试音频</button>
+  <button onclick="clearChat()">🗑 清空对话</button>
+  <button onclick="zoomIn()">🔎 Zoom In</button>
+  <button onclick="zoomOut()">🔍 Zoom Out</button>
+  <button onclick="moveUp()">⬆️ Up</button>
+  <button onclick="moveDown()">⬇️ Down</button>
+</div>
+
+<div id="settingsPanel"></div>
+<audio id="testAudio" src="https://actions.google.com/sounds/v1/alarms/bugle_tune.ogg" crossorigin="anonymous" style="display:none"></audio>
+
+<script src="app/settings.js"></script>
+<script src="app/camera.js"></script>
+<script src="app/chat.js"></script>
+<script>
+  // ── Pixi + Live2D ──
+  const app = new PIXI.Application({
+    view: document.getElementById('canvas'), autoStart: true, resizeTo: window,
+    backgroundColor: 0x1a1a2e, resolution: window.devicePixelRatio || 1, autoDensity: true,
+  });
+
+  let currentModel = null;
+  let baseScale = 1;
+
+  // Test-audio lipsync state (separate from TTS)
+  let testAudioCtx, testAnalyser, testSource, testDataArray;
+  window.isAudioPlaying = window.isAudioPlaying || false;
+
+  // Animation state
+  let mouthEnvelope = 0, mouthFormSmooth = 0;
+  let gazeAngleX = 0, gazeAngleY = 0, gazeEyeX = 0, gazeEyeY = 0;
+  let mouseX = 0, mouseY = 0, lastMouseMoveAt = 0;
+  let blinkValue = 1, blinkPhase = 'idle', blinkPhaseStart = 0;
+  let nextBlinkAt = performance.now() + 1500;
+  let breathPhase = 0;
+
+  window.interactionState = window.interactionState || 'idle';
+  window.glanceRight      = window.glanceRight      || false;
+
+  function setParam(core, id, v) {
+    try { core.setParameterValueById(id, v); } catch (_) {}
+  }
+
+  async function init() {
+    try {
+      document.getElementById('status').innerText = 'Loading model...';
+      const model = await PIXI.live2d.Live2DModel.from('aolan/aolan.model3.json');
+      currentModel = model;
+      app.stage.addChild(model);
+
+      const targetH = innerHeight * 0.95;
+      baseScale = targetH / model.height;
+      model.scale.set(baseScale);
+      model.x = (innerWidth / 2) - (model.width * baseScale / 2);
+      model.y = -(model.height * baseScale * 0.1);
+
+      model.interactive = true; model.buttonMode = true;
+      let dragging = false, dragStart = {x:0,y:0}, modelStart = {x:0,y:0};
+      model.on('pointerdown', e => {
+        dragging = true;
+        dragStart.x = e.data.global.x; dragStart.y = e.data.global.y;
+        modelStart.x = model.x;        modelStart.y = model.y;
+      });
+
+      app.stage.interactive = true;
+      app.stage.hitArea = new PIXI.Rectangle(0, 0, innerWidth, innerHeight);
+
+      const recordLookAt = e => { mouseX = e.data.global.x; mouseY = e.data.global.y; lastMouseMoveAt = performance.now(); };
+      app.stage.on('pointermove', e => { dragging ? (model.x = modelStart.x + (e.data.global.x - dragStart.x), model.y = modelStart.y + (e.data.global.y - dragStart.y)) : recordLookAt(e); });
+      app.stage.on('pointerdown', recordLookAt);
+      app.stage.on('pointertap',  recordLookAt);
+      app.stage.on('pointerup',   () => dragging = false);
+      app.stage.on('pointerupoutside', () => dragging = false);
+
+      if (model.internalModel.focusController) model.internalModel.focusController.focus = () => {};
+
+      // ── Main ticker ──
+      app.ticker.add(() => {
+        if (!currentModel) return;
+        const core = currentModel.internalModel.coreModel;
+        const now  = performance.now();
+        const dt   = Math.min(0.05, app.ticker.deltaMS / 1000);
+
+        // Lipsync — pick active analyser (TTS first, then test audio)
+        const activeAnalyser  = window.ttsAnalyser  || testAnalyser;
+        const activeDataArray = window.ttsDataArray || testDataArray;
+        let target = 0;
+        if (window.isAudioPlaying && activeAnalyser && activeDataArray) {
+          activeAnalyser.getByteFrequencyData(activeDataArray);
+          let sum = 0, cnt = 0;
+          for (let i = 1; i < 22 && i < activeDataArray.length; i++) { sum += activeDataArray[i]; cnt++; }
+          const avg = (sum / cnt) / 255;
+          target = Math.min(1, Math.max(0, (avg - 0.04) * 2.6));
+        }
+        const rising = target > mouthEnvelope;
+        mouthEnvelope += (target - mouthEnvelope) * (1 - Math.exp(-dt / (rising ? 0.035 : 0.085)));
+        const formNoise  = Math.sin(now * 0.011) * 0.6 + Math.sin(now * 0.027) * 0.4;
+        const formTarget = mouthEnvelope > 0.08 ? formNoise * 0.25 : 0;
+        mouthFormSmooth += (formTarget - mouthFormSmooth) * 0.08;
+        setParam(core, 'ParamMouthOpenY', mouthEnvelope);
+        setParam(core, 'ParamJawOpen',   mouthEnvelope * 0.6);
+        setParam(core, 'ParamMouthForm', mouthFormSmooth);
+
+        // Gaze target based on interaction state
+        let tAX = 0, tAY = 0, tEX = 0, tEY = 0;
+        const state = window.interactionState;
+        if (state === 'thinking') {
+          tAX = window.glanceRight ? 10 : -10; tAY = -10; tEX = window.glanceRight ? 0.4 : -0.4; tEY = -0.5;
+        } else if (state === 'glancing') {
+          tAX = 14; tAY = -10; tEX = 0.6; tEY = -0.4;
+        } else if (state === 'speaking') {
+          // lock center — targets stay 0
+        } else {
+          // idle
+          const sinceMove = (now - lastMouseMoveAt) / 1000;
+          if (lastMouseMoveAt > 0 && sinceMove < 1.5) {
+            const nx = (mouseX / innerWidth) * 2 - 1;
+            const ny = (mouseY / innerHeight) * 2 - 1;
+            tAX = nx * 28; tAY = -ny * 24; tEX = nx * 1.0; tEY = -ny * 1.0;
+          } else {
+            tAX = Math.sin(now * 0.00055) * 7 + Math.sin(now * 0.00097) * 3;
+            tAY = Math.sin(now * 0.00078) * 2.5;
+            tEX = tAX / 35; tEY = tAY / 35;
+          }
+        }
+
+        const gazeTau = (state === 'speaking' || state === 'glancing') ? 0.15 : 0.12;
+        const gk = 1 - Math.exp(-dt / gazeTau);
+        gazeAngleX += (tAX - gazeAngleX) * gk;
+        gazeAngleY += (tAY - gazeAngleY) * gk;
+        gazeEyeX   += (tEX - gazeEyeX) * gk;
+        gazeEyeY   += (tEY - gazeEyeY) * gk;
+
+        const bodyMult = (state === 'speaking') ? 0.3 : 0.7;
+        setParam(core, 'ParamAngleX',    gazeAngleX);
+        setParam(core, 'ParamAngleY',    gazeAngleY);
+        setParam(core, 'ParamAngleZ',    gazeAngleX * 0.3);
+        setParam(core, 'ParamEyeBallX',  gazeEyeX);
+        setParam(core, 'ParamEyeBallY',  gazeEyeY);
+        setParam(core, 'ParamBodyAngleX', gazeAngleX * bodyMult * 0.55);
+        setParam(core, 'ParamBodyAngleY', gazeAngleY * bodyMult * 0.4);
+        setParam(core, 'ParamBodyAngleZ', gazeAngleX * bodyMult * 0.2);
+
+        // Blink
+        if (blinkPhase === 'idle' && now >= nextBlinkAt) { blinkPhase = 'closing'; blinkPhaseStart = now; }
+        if (blinkPhase === 'closing') {
+          blinkValue = Math.max(0, 1 - (now - blinkPhaseStart) / 80);
+          if (blinkValue <= 0) { blinkPhase = 'opening'; blinkPhaseStart = now; }
+        } else if (blinkPhase === 'opening') {
+          blinkValue = Math.min(1, (now - blinkPhaseStart) / 120);
+          if (blinkValue >= 1) {
+            blinkPhase = 'idle'; blinkValue = 1;
+            nextBlinkAt = now + (Math.random() < 0.12 ? 180 : 2500 + Math.random() * 3500);
+          }
+        }
+        setParam(core, 'ParamEyeLOpen', blinkValue);
+        setParam(core, 'ParamEyeROpen', blinkValue);
 
         // Breath
-        let breathPhase = 0;
-        let breathAmp = 0.5;
+        breathPhase += dt * 1.1;
+        setParam(core, 'ParamBreath', Math.sin(breathPhase) * 0.5 + 0.5);
+      });
 
-        function setParam(core, id, v) {
-            try { core.setParameterValueById(id, v); } catch (e) { /* param may not exist */ }
-        }
+      document.getElementById('status').innerText = 'Vega Online ✨';
+      window.addEventListener('resize', () => {
+        model.x = (innerWidth / 2) - (model.width * model.scale.x / 2);
+      });
+    } catch (e) {
+      document.getElementById('status').innerText = 'Error: ' + e.message;
+      console.error(e);
+    }
+  }
 
-        async function init() {
-            try {
-                statusEl.innerText = 'Loading Model Data...';
-                const model = await PIXI.live2d.Live2DModel.from('aolan/aolan.model3.json');
-                currentModel = model;
-                app.stage.addChild(model);
+  // ── Test audio (dev) ──
+  window.startTalking = function () {
+    const audio = document.getElementById('testAudio');
+    if (!testAudioCtx) {
+      testAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      testAnalyser = testAudioCtx.createAnalyser(); testAnalyser.fftSize = 256;
+      testSource = testAudioCtx.createMediaElementSource(audio);
+      testSource.connect(testAnalyser); testAnalyser.connect(testAudioCtx.destination);
+      testDataArray = new Uint8Array(testAnalyser.frequencyBinCount);
+    }
+    if (testAudioCtx.state === 'suspended') testAudioCtx.resume();
+    audio.onended = () => { window.isAudioPlaying = false; };
+    if (audio.paused) { audio.play().then(() => { window.isAudioPlaying = true; }); }
+    else { audio.pause(); audio.currentTime = 0; window.isAudioPlaying = false; }
+  };
 
-                const targetHeight = innerHeight * 0.95; 
-                baseScale = targetHeight / model.height;
-                model.scale.set(baseScale);
-                model.x = (innerWidth / 2) - ((model.width * baseScale) / 2);
-                model.y = - (model.height * baseScale * 0.1); 
+  window.zoomIn  = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 1.1), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
+  window.zoomOut = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 0.9), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
+  window.moveUp   = () => currentModel && (currentModel.y -= 50);
+  window.moveDown = () => currentModel && (currentModel.y += 50);
 
-                model.interactive = true;
-                model.buttonMode = true;
-                let dragging = false;
-                let dragStart = { x: 0, y: 0 };
-                let modelStart = { x: 0, y: 0 };
-
-                model.on('pointerdown', (e) => {
-                    dragging = true;
-                    dragStart.x = e.data.global.x;
-                    dragStart.y = e.data.global.y;
-                    modelStart.x = model.x;
-                    modelStart.y = model.y;
-                });
-
-                const recordLookAt = (e) => {
-                    mouseX = e.data.global.x;
-                    mouseY = e.data.global.y;
-                    lastMouseMoveAt = performance.now();
-                };
-
-                app.stage.interactive = true;
-                app.stage.hitArea = new PIXI.Rectangle(0, 0, innerWidth, innerHeight);
-                // Both move and click/tap update the look-at target so it works on touch too.
-                app.stage.on('pointermove', (e) => {
-                    if (dragging) {
-                        model.x = modelStart.x + (e.data.global.x - dragStart.x);
-                        model.y = modelStart.y + (e.data.global.y - dragStart.y);
-                    } else {
-                        recordLookAt(e);
-                    }
-                });
-                app.stage.on('pointerdown', recordLookAt);
-                app.stage.on('pointertap', recordLookAt);
-
-                app.stage.on('pointerup', () => dragging = false);
-                app.stage.on('pointerupoutside', () => dragging = false);
-
-                // Disable the library's built-in focus tracker — we drive gaze ourselves
-                // so it can be smoothly recentered while speaking.
-                if (model.internalModel.focusController) {
-                    const fc = model.internalModel.focusController;
-                    fc.focus = function () {};
-                }
-
-                // ==========================================
-                // NATURAL LIPSYNC + GAZE + BLINK + BREATH
-                // ==========================================
-                app.ticker.add(() => {
-                    if (!currentModel) return;
-                    const core = currentModel.internalModel.coreModel;
-                    const now = performance.now();
-                    const dt = Math.min(0.05, app.ticker.deltaMS / 1000);
-
-                    // ---------- Lipsync envelope ----------
-                    let target = 0;
-                    if (isAudioPlaying && analyser) {
-                        analyser.getByteFrequencyData(dataArray);
-                        // Speech band: with sampleRate 44100 & fftSize 256, each bin ≈ 172Hz.
-                        // Bins 1..22 cover ~170Hz–3800Hz, where vowels/consonants live.
-                        let sum = 0, count = 0;
-                        for (let i = 1; i < 22 && i < dataArray.length; i++) {
-                            sum += dataArray[i];
-                            count++;
-                        }
-                        const avg = (sum / count) / 255;
-                        target = Math.min(1, Math.max(0, (avg - 0.04) * 2.6));
-                    }
-                    // Asymmetric envelope: open quickly, close slowly — like real jaws.
-                    const rising = target > mouthEnvelope;
-                    const k = 1 - Math.exp(-dt / (rising ? 0.035 : 0.085));
-                    mouthEnvelope += (target - mouthEnvelope) * k;
-
-                    // Drive jaw + mouth together, with a subtle vowel-shape variation.
-                    const formNoise = (Math.sin(now * 0.011) * 0.6 + Math.sin(now * 0.027) * 0.4);
-                    const formTarget = mouthEnvelope > 0.08 ? formNoise * 0.25 : 0;
-                    mouthFormSmooth += (formTarget - mouthFormSmooth) * 0.08;
-
-                    setParam(core, 'ParamMouthOpenY', mouthEnvelope);
-                    setParam(core, 'ParamJawOpen',    mouthEnvelope * 0.6);
-                    setParam(core, 'ParamMouthForm',  mouthFormSmooth);
-
-                    // ---------- Gaze ----------
-                    // Speaking: lock to center (viewer).
-                    // Not speaking: follow the mouse at its last known position.
-                    //   If the page just loaded and mouse was never moved, do idle sway instead.
-                    let targetAngleX = 0, targetAngleY = 0, targetEyeX = 0, targetEyeY = 0;
-                    if (!isAudioPlaying) {
-                        if (lastMouseMoveAt > 0) {
-                            // Always follow the last known pointer position — no timeout.
-                            const nx = (mouseX / innerWidth)  * 2 - 1;
-                            const ny = (mouseY / innerHeight) * 2 - 1;
-                            targetAngleX =  nx * 28;
-                            targetAngleY = -ny * 24;
-                            targetEyeX   =  nx * 1.0;
-                            targetEyeY   = -ny * 1.0;
-                        } else {
-                            // No mouse input yet — gentle idle sway so she doesn't freeze.
-                            const swayX = Math.sin(now * 0.00055) * 7 + Math.sin(now * 0.00097) * 3;
-                            const swayY = Math.sin(now * 0.00078) * 2.5;
-                            targetAngleX = swayX;
-                            targetAngleY = swayY;
-                            targetEyeX   = swayX / 35;
-                            targetEyeY   = swayY / 35;
-                        }
-                    }
-
-                    // One-pole smoothing — speaking pulls back faster so she snaps to viewer.
-                    const gazeTau = isAudioPlaying ? 0.18 : 0.12;
-                    const gk = 1 - Math.exp(-dt / gazeTau);
-                    gazeAngleX += (targetAngleX - gazeAngleX) * gk;
-                    gazeAngleY += (targetAngleY - gazeAngleY) * gk;
-                    gazeEyeX   += (targetEyeX   - gazeEyeX)   * gk;
-                    gazeEyeY   += (targetEyeY   - gazeEyeY)   * gk;
-
-                    // Body lags behind head with a larger ratio when idle so arms get
-                    // physically dragged along — the bigger the body sway the more the
-                    // physics engine carries the sleeves and hands.
-                    const bodyMult = isAudioPlaying ? 0.3 : 0.7;
-                    setParam(core, 'ParamAngleX',     gazeAngleX);
-                    setParam(core, 'ParamAngleY',     gazeAngleY);
-                    setParam(core, 'ParamAngleZ',     gazeAngleX * 0.25);
-                    setParam(core, 'ParamEyeBallX',   gazeEyeX);
-                    setParam(core, 'ParamEyeBallY',   gazeEyeY);
-                    setParam(core, 'ParamBodyAngleX', gazeAngleX * bodyMult);
-                    setParam(core, 'ParamBodyAngleY', gazeAngleY * (bodyMult * 0.6));
-                    setParam(core, 'ParamBodyAngleZ', gazeAngleX * 0.12);
-
-                    // ---------- Blink ----------
-                    if (blinkPhase === 'idle' && now >= nextBlinkAt) {
-                        blinkPhase = 'closing';
-                        blinkPhaseStart = now;
-                    }
-                    if (blinkPhase === 'closing') {
-                        const t = (now - blinkPhaseStart) / 80;
-                        blinkValue = Math.max(0, 1 - t);
-                        if (t >= 1) { blinkPhase = 'opening'; blinkPhaseStart = now; }
-                    } else if (blinkPhase === 'opening') {
-                        const t = (now - blinkPhaseStart) / 120;
-                        blinkValue = Math.min(1, t);
-                        if (t >= 1) {
-                            blinkPhase = 'idle';
-                            blinkValue = 1;
-                            // Occasional double-blink for life
-                            const doubleBlink = Math.random() < 0.12;
-                            nextBlinkAt = now + (doubleBlink ? 180 : 2500 + Math.random() * 3500);
-                        }
-                    }
-                    setParam(core, 'ParamEyeLOpen', blinkValue);
-                    setParam(core, 'ParamEyeROpen', blinkValue);
-
-                    // ---------- Breath ----------
-                    // Collapse amplitude while speaking so physics-driven head sway
-                    // doesn't pull the gaze off-center. Smooth transition in/out.
-                    const breathAmpTarget = isAudioPlaying ? 0.04 : 0.5;
-                    breathAmp += (breathAmpTarget - breathAmp) * (1 - Math.exp(-dt / 0.4));
-                    breathPhase += dt * 1.1;
-                    setParam(core, 'ParamBreath', Math.sin(breathPhase) * breathAmp + 0.5);
-                });
-
-                statusEl.innerText = 'Vega Online ✨ (Lipsync Ready!)';
-                
-                window.addEventListener('resize', () => {
-                    model.x = (innerWidth / 2) - ((model.width * model.scale.x) / 2);
-                });
-
-            } catch (err) {
-                console.error(err);
-                statusEl.innerText = 'Error loading shell: ' + err.message;
-            }
-        }
-
-        window.startTalking = function() {
-            const audio = document.getElementById('testAudio');
-            
-            if (!audioCtx) {
-                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                analyser = audioCtx.createAnalyser();
-                analyser.fftSize = 256;
-                source = audioCtx.createMediaElementSource(audio);
-                source.connect(analyser);
-                analyser.connect(audioCtx.destination);
-                dataArray = new Uint8Array(analyser.frequencyBinCount);
-            }
-
-            if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-
-            audio.onended = () => {
-                isAudioPlaying = false;
-                document.getElementById('talkBtn').innerText = '🎤 播放测试人声 (Human Lipsync)';
-                document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
-            };
-
-            if (audio.paused) {
-                audio.play().then(() => {
-                    isAudioPlaying = true;
-                    document.getElementById('talkBtn').innerText = '⏹️ 停止语音';
-                    document.getElementById('talkBtn').style.background = 'rgba(255,0,0,0.5)';
-                }).catch(e => {
-                    statusEl.innerText = 'Audio Play Error: ' + e.message;
-                });
-            } else {
-                audio.pause();
-                audio.currentTime = 0;
-                isAudioPlaying = false;
-                document.getElementById('talkBtn').innerText = '🎤 播放测试人声 (Human Lipsync)';
-                document.getElementById('talkBtn').style.background = 'rgba(0,0,0,0.7)';
-                // Mouth envelope, gaze, etc. all release naturally in the ticker.
-            }
-        };
-
-        window.zoomIn = () => { if(currentModel) { currentModel.scale.set(currentModel.scale.x * 1.1); currentModel.x = (innerWidth / 2) - ((currentModel.width * currentModel.scale.x) / 2); } };
-        window.zoomOut = () => { if(currentModel) { currentModel.scale.set(currentModel.scale.x * 0.9); currentModel.x = (innerWidth / 2) - ((currentModel.width * currentModel.scale.x) / 2); } };
-        window.moveUp = () => { if(currentModel) currentModel.y -= 50; };
-        window.moveDown = () => { if(currentModel) currentModel.y += 50; };
-
-        init();
-    </script>
+  init();
+</script>
 </body>
 </html>
