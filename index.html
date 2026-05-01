@@ -188,6 +188,7 @@
   let blinkValue = 1, blinkPhase = 'idle', blinkPhaseStart = 0;
   let nextBlinkAt = performance.now() + 1500;
   let breathPhase = 0;
+  let speakingSwayPhase = 0;   // gentle head sway while speaking
 
   window.interactionState = window.interactionState || 'idle';
   window.glanceRight      = window.glanceRight      || false;
@@ -262,7 +263,8 @@
           let sum = 0, cnt = 0;
           for (let i = 1; i < 22 && i < activeDataArray.length; i++) { sum += activeDataArray[i]; cnt++; }
           const avg = (sum / cnt) / 255;
-          target = Math.min(1, Math.max(0, (avg - 0.04) * 2.6));
+          // Lower noise floor so even quiet TTS audio drives the mouth
+          target = Math.min(1, Math.max(0, (avg - 0.01) * 4.2));
         }
         const rising = target > mouthEnvelope;
         mouthEnvelope += (target - mouthEnvelope) * (1 - Math.exp(-dt / (rising ? 0.035 : 0.085)));
@@ -273,10 +275,17 @@
         setParam(core, 'ParamJawOpen',   mouthEnvelope * 0.6);
         setParam(core, 'ParamMouthForm', mouthFormSmooth);
 
-        // Gaze target based on interaction state
-        // Gaze locked to viewer at all times — eyes never drift, head holds center.
-        // (Asymmetric eye art is more forgiving when stationary.)
+        // Speaking sway: gentle head oscillation while audio plays
+        speakingSwayPhase += dt * 2.4;
+        const speaking = window.isAudioPlaying;
+
         let tAX = 0, tAY = 0, tEX = 0, tEY = 0;
+        if (speaking) {
+          // Subtle figure-8 style head movement (increases with voice loudness)
+          const sway = 0.3 + mouthEnvelope * 0.7;
+          tAX = Math.sin(speakingSwayPhase)       * 5  * sway;
+          tAY = Math.sin(speakingSwayPhase * 0.6) * 2.5 * sway;
+        }
 
         const gk = 1 - Math.exp(-dt / 0.15);
         gazeAngleX += (tAX - gazeAngleX) * gk;
@@ -294,17 +303,17 @@
         setParam(core, 'ParamBodyAngleY', gazeAngleY * bodyMult * 0.4);
         setParam(core, 'ParamBodyAngleZ', gazeAngleX * bodyMult * 0.2);
 
-        // Subtle "alive" idle: tiny eye smile + cheek blush + mouth-corner curve
-        // Pulses gently with breath so it never freezes.
+        // Alive idle + enhanced speaking expressiveness
         const liveBreath = (Math.sin(breathPhase) + 1) * 0.5;            // 0..1
         const liveBase   = 0.12 + liveBreath * 0.06;                      // ~0.12-0.18
-        // Eye smile fights the lipsync mouth open, so dampen when speaking
-        const eyeSmile = window.isAudioPlaying ? liveBase * 0.4 : liveBase;
+        // When speaking: warmer smile, deeper blush, livelier expression
+        const eyeSmile = speaking ? (liveBase + 0.20) : liveBase;         // 微微眯眼笑
         setParam(core, 'ParamEyeLSmile', eyeSmile);
         setParam(core, 'ParamEyeRSmile', eyeSmile);
-        setParam(core, 'ParamCheek',     0.25 + liveBreath * 0.15);      // soft cheek glow
-        // Mouth corners: only when not opening for speech
-        if (mouthEnvelope < 0.15) setParam(core, 'ParamMouthForm', 0.35);
+        const cheek = speaking ? (0.55 + liveBreath * 0.12) : (0.25 + liveBreath * 0.15);
+        setParam(core, 'ParamCheek', cheek);                               // 脸红加深
+        // Mouth corners raised unless jaw is wide open
+        if (mouthEnvelope < 0.18) setParam(core, 'ParamMouthForm', 0.45); // 嘴角微扬
 
         // Blink
         if (blinkPhase === 'idle' && now >= nextBlinkAt) { blinkPhase = 'closing'; blinkPhaseStart = now; }

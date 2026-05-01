@@ -65,6 +65,10 @@ window.sendMessage = async function () {
       if (image) setInteractionState('glancing', true);
       setTimeout(() => speakTTS(clean, s.tts), image ? 1200 : 0);
     } else {
+      if (!window._ttsHintShown) {
+        window._ttsHintShown = true;
+        appendBubble('system', '💡 在 ⚙️ 设置里勾选"启用 TTS"并填入 API Key，Vega 就能开口说话了');
+      }
       setInteractionState('idle', false);
     }
   } catch (e) {

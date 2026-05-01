@@ -66,7 +66,10 @@ function buildSettingsPanel() {
         oninput="document.getElementById('sp-temp-val').textContent=this.value">
 
       <div class="sp-section" style="margin-top:16px">🔊 语音合成 (TTS)</div>
-      <label><input id="sp-tts-enabled" type="checkbox" ${s.tts.enabled ? 'checked' : ''}> 启用 TTS</label>
+      <label style="font-size:14px;color:${s.tts.enabled ? '#4f4' : '#f84'};font-weight:bold">
+        <input id="sp-tts-enabled" type="checkbox" ${s.tts.enabled ? 'checked' : ''}>
+        启用 TTS ${s.tts.enabled ? '✓ 已开启' : '← 必须勾选才能说话'}
+      </label>
       <label>供应商</label>
       <select id="sp-tts-provider">${ttsOpts}</select>
       <label>Voice / Voice ID</label>
