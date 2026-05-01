@@ -72,6 +72,8 @@ function buildSettingsPanel() {
       </label>
       <label>供应商</label>
       <select id="sp-tts-provider">${ttsOpts}</select>
+      <label>Base URL <small>（MiniMax: 国内留空，海外填 https://api.minimaxi.chat）</small></label>
+      <input id="sp-tts-base" type="url" placeholder="https://api.minimax.chat" value="${s.tts.baseUrl || ''}">
       <label>Voice / Voice ID</label>
       <input id="sp-tts-voice" placeholder="nova" value="${s.tts.voice}">
       <label>Model</label>
@@ -96,7 +98,7 @@ function buildSettingsPanel() {
   // Auto-save on any field change so data isn't lost if user closes without clicking 保存
   const autoSaveIds = [
     'sp-llm-base','sp-llm-model','sp-llm-key','sp-llm-system','sp-llm-temp',
-    'sp-tts-enabled','sp-tts-provider','sp-tts-voice','sp-tts-model','sp-tts-key','sp-tts-groupid',
+    'sp-tts-enabled','sp-tts-provider','sp-tts-base','sp-tts-voice','sp-tts-model','sp-tts-key','sp-tts-groupid',
   ];
   autoSaveIds.forEach(id => {
     const el = document.getElementById(id);
@@ -126,6 +128,7 @@ window.saveSettingsFromPanel = function (silent) {
   s.chat.temperature = parseFloat(document.getElementById('sp-llm-temp').value);
   s.tts.enabled      = document.getElementById('sp-tts-enabled').checked;
   s.tts.provider     = document.getElementById('sp-tts-provider').value;
+  s.tts.baseUrl      = document.getElementById('sp-tts-base').value.trim();
   s.tts.voice        = document.getElementById('sp-tts-voice').value.trim();
   s.tts.model        = document.getElementById('sp-tts-model').value.trim();
   s.tts.apiKey       = document.getElementById('sp-tts-key').value.trim();

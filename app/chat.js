@@ -86,6 +86,7 @@ async function speakTTS(text, cfg) {
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
         provider: cfg.provider,
+        baseUrl:  cfg.baseUrl || undefined,
         voice:    cfg.voice || undefined,
         model:    cfg.model || undefined,
         apiKey:   cfg.apiKey,

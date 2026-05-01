@@ -55,7 +55,9 @@ export default async function handler(req) {
     if (provider === 'minimax') {
       const groupId = extra.groupId;
       if (!groupId) throw new Error('MiniMax requires extra.groupId');
-      const r = await fetch(`https://api.minimaxi.chat/v1/t2a_v2?GroupId=${groupId}`, {
+      // Default to mainland endpoint; user can override via baseUrl for international (api.minimaxi.chat)
+      const base = (baseUrl || 'https://api.minimax.chat').replace(/\/$/, '');
+      const r = await fetch(`${base}/v1/t2a_v2?GroupId=${groupId}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${apiKey}` },
         body: JSON.stringify({
