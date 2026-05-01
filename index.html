@@ -63,6 +63,18 @@
     #snapBtn { display: none; font-size: 16px; }
     #snapBtn.snapped { background: rgba(255,160,0,.35); color: #fa0; border-color: #fa0; }
 
+    /* ── Expression bar ── */
+    #exprBar {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 6px; z-index: 100;
+    }
+    #exprBar button {
+      width: 40px; height: 40px; border-radius: 50%; font-size: 18px;
+      background: rgba(0,0,0,.55); color: #ffd; border: 1px solid #0f04;
+      cursor: pointer;
+    }
+    #exprBar button:hover { background: rgba(255,200,0,.25); border-color: #fc4; }
+
     /* ── Dev controls (collapsed) ── */
     #devToggle {
       position: absolute; bottom: 10px; right: 10px; z-index: 200;
@@ -130,6 +142,13 @@
   <button id="snapBtn" onclick="toggleSnap()" title="附上当前画面">📸</button>
   <textarea id="chatInput" placeholder="和 Vega 说点什么…" rows="1"></textarea>
   <button id="sendBtn" onclick="sendMessage()">↑</button>
+</div>
+
+<div id="exprBar">
+  <button onclick="setExpr('expression3')" title="星星眼">⭐</button>
+  <button onclick="setExpr('expression2')" title="脸红">🥰</button>
+  <button onclick="setExpr('expression1')" title="脸黑">😒</button>
+  <button onclick="clearExpr()" title="还原">↺</button>
 </div>
 
 <button id="devToggle" onclick="document.getElementById('devControls').style.display=document.getElementById('devControls').style.display==='flex'?'none':'flex'">DEV</button>
@@ -268,12 +287,24 @@
         const bodyMult = 0.3;
         setParam(core, 'ParamAngleX',    gazeAngleX);
         setParam(core, 'ParamAngleY',    gazeAngleY);
-        setParam(core, 'ParamAngleZ',    gazeAngleX * 0.3);
+        setParam(core, 'ParamAngleZ',    gazeAngleX * 0.3 + 3);  // slight charming tilt
         setParam(core, 'ParamEyeBallX',  gazeEyeX);
         setParam(core, 'ParamEyeBallY',  gazeEyeY);
         setParam(core, 'ParamBodyAngleX', gazeAngleX * bodyMult * 0.55);
         setParam(core, 'ParamBodyAngleY', gazeAngleY * bodyMult * 0.4);
         setParam(core, 'ParamBodyAngleZ', gazeAngleX * bodyMult * 0.2);
+
+        // Subtle "alive" idle: tiny eye smile + cheek blush + mouth-corner curve
+        // Pulses gently with breath so it never freezes.
+        const liveBreath = (Math.sin(breathPhase) + 1) * 0.5;            // 0..1
+        const liveBase   = 0.12 + liveBreath * 0.06;                      // ~0.12-0.18
+        // Eye smile fights the lipsync mouth open, so dampen when speaking
+        const eyeSmile = window.isAudioPlaying ? liveBase * 0.4 : liveBase;
+        setParam(core, 'ParamEyeLSmile', eyeSmile);
+        setParam(core, 'ParamEyeRSmile', eyeSmile);
+        setParam(core, 'ParamCheek',     0.25 + liveBreath * 0.15);      // soft cheek glow
+        // Mouth corners: only when not opening for speech
+        if (mouthEnvelope < 0.15) setParam(core, 'ParamMouthForm', 0.35);
 
         // Blink
         if (blinkPhase === 'idle' && now >= nextBlinkAt) { blinkPhase = 'closing'; blinkPhaseStart = now; }
@@ -319,6 +350,15 @@
     audio.onended = () => { window.isAudioPlaying = false; };
     if (audio.paused) { audio.play().then(() => { window.isAudioPlaying = true; }); }
     else { audio.pause(); audio.currentTime = 0; window.isAudioPlaying = false; }
+  };
+
+  window.setExpr = function (name) {
+    if (!currentModel) return;
+    try { currentModel.expression(name); } catch (e) { console.warn('expression failed:', e); }
+  };
+  window.clearExpr = function () {
+    if (!currentModel) return;
+    try { currentModel.expression(); } catch (e) { /* ignore */ }
   };
 
   window.zoomIn  = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 1.1), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
