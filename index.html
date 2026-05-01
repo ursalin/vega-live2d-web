@@ -290,7 +290,8 @@
           target = Math.min(0.88, Math.pow(x * 5, 0.72));
         }
         const rising = target > mouthEnvelope;
-        mouthEnvelope += (target - mouthEnvelope) * (1 - Math.exp(-dt / (rising ? 0.040 : 0.140)));
+        // Tight timing tracks each syllable (~150-200ms in Chinese speech)
+        mouthEnvelope += (target - mouthEnvelope) * (1 - Math.exp(-dt / (rising ? 0.020 : 0.055)));
         const formNoise  = Math.sin(now * 0.011) * 0.6 + Math.sin(now * 0.027) * 0.4;
         const formTarget = mouthEnvelope > 0.08 ? formNoise * 0.25 : 0;
         mouthFormSmooth += (formTarget - mouthFormSmooth) * 0.08;

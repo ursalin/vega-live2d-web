@@ -111,6 +111,7 @@ async function playAudioBuffer(arrayBuffer) {
     ttsAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
     ttsAnalyser = ttsAudioCtx.createAnalyser();
     ttsAnalyser.fftSize = 256;
+    ttsAnalyser.smoothingTimeConstant = 0.25;  // default 0.8 is way too smooth — kills syllable tracking
     ttsDataArray = new Uint8Array(ttsAnalyser.frequencyBinCount);
     ttsAnalyser.connect(ttsAudioCtx.destination);
     // Expose to live2d.js ticker
