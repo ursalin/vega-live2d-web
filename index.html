@@ -284,11 +284,13 @@
           let sum = 0, cnt = 0;
           for (let i = 1; i < 22 && i < activeDataArray.length; i++) { sum += activeDataArray[i]; cnt++; }
           const avg = (sum / cnt) / 255;
-          // Lower noise floor so even quiet TTS audio drives the mouth
-          target = Math.min(1, Math.max(0, (avg - 0.01) * 4.2));
+          // Nonlinear compression: noise floor 0.06, soft power curve so mouth
+          // has natural dynamics instead of saturating wide-open.
+          const x = Math.max(0, avg - 0.06);
+          target = Math.min(0.88, Math.pow(x * 5, 0.72));
         }
         const rising = target > mouthEnvelope;
-        mouthEnvelope += (target - mouthEnvelope) * (1 - Math.exp(-dt / (rising ? 0.035 : 0.085)));
+        mouthEnvelope += (target - mouthEnvelope) * (1 - Math.exp(-dt / (rising ? 0.040 : 0.140)));
         const formNoise  = Math.sin(now * 0.011) * 0.6 + Math.sin(now * 0.027) * 0.4;
         const formTarget = mouthEnvelope > 0.08 ? formNoise * 0.25 : 0;
         mouthFormSmooth += (formTarget - mouthFormSmooth) * 0.08;
