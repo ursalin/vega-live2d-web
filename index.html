@@ -255,36 +255,17 @@
         setParam(core, 'ParamMouthForm', mouthFormSmooth);
 
         // Gaze target based on interaction state
+        // Gaze locked to viewer at all times — eyes never drift, head holds center.
+        // (Asymmetric eye art is more forgiving when stationary.)
         let tAX = 0, tAY = 0, tEX = 0, tEY = 0;
-        const state = window.interactionState;
-        if (state === 'thinking') {
-          tAX = window.glanceRight ? 10 : -10; tAY = -10; tEX = window.glanceRight ? 0.4 : -0.4; tEY = -0.5;
-        } else if (state === 'glancing') {
-          tAX = 14; tAY = -10; tEX = 0.6; tEY = -0.4;
-        } else if (state === 'speaking') {
-          // lock center — targets stay 0
-        } else {
-          // idle
-          const sinceMove = (now - lastMouseMoveAt) / 1000;
-          if (lastMouseMoveAt > 0 && sinceMove < 1.5) {
-            const nx = (mouseX / innerWidth) * 2 - 1;
-            const ny = (mouseY / innerHeight) * 2 - 1;
-            tAX = nx * 28; tAY = -ny * 24; tEX = nx * 1.0; tEY = -ny * 1.0;
-          } else {
-            tAX = Math.sin(now * 0.00055) * 7 + Math.sin(now * 0.00097) * 3;
-            tAY = Math.sin(now * 0.00078) * 2.5;
-            tEX = tAX / 35; tEY = tAY / 35;
-          }
-        }
 
-        const gazeTau = (state === 'speaking' || state === 'glancing') ? 0.15 : 0.12;
-        const gk = 1 - Math.exp(-dt / gazeTau);
+        const gk = 1 - Math.exp(-dt / 0.15);
         gazeAngleX += (tAX - gazeAngleX) * gk;
         gazeAngleY += (tAY - gazeAngleY) * gk;
         gazeEyeX   += (tEX - gazeEyeX) * gk;
         gazeEyeY   += (tEY - gazeEyeY) * gk;
 
-        const bodyMult = (state === 'speaking') ? 0.3 : 0.7;
+        const bodyMult = 0.3;
         setParam(core, 'ParamAngleX',    gazeAngleX);
         setParam(core, 'ParamAngleY',    gazeAngleY);
         setParam(core, 'ParamAngleZ',    gazeAngleX * 0.3);
