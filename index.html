@@ -180,7 +180,7 @@
   async function init() {
     try {
       document.getElementById('status').innerText = 'Loading model...';
-      const model = await PIXI.live2d.Live2DModel.from('yinfa/银发拿花男.model3.json');
+      const model = await PIXI.live2d.Live2DModel.from('yinfa/yinfa.model3.json');
       currentModel = model;
       app.stage.addChild(model);
 
