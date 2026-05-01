@@ -218,6 +218,27 @@
         modelStart.x = model.x;        modelStart.y = model.y;
       });
 
+      // Body-part tap detection — Vega reacts to where you poke her
+      model.on('pointertap', e => {
+        if (!currentModel) return;
+        const lx = e.data.global.x - currentModel.x;
+        const ly = e.data.global.y - currentModel.y;
+        const w  = currentModel.width, h = currentModel.height;
+        const xr = lx / w, yr = ly / h;
+        let zone;
+        if (yr < 0.16)      zone = '头发';
+        else if (yr < 0.30) zone = (xr > 0.35 && xr < 0.65) ? '脸' : (xr < 0.5 ? '左耳' : '右耳');
+        else if (yr < 0.40) zone = '脖子';
+        else if (yr < 0.55) {
+          if (xr < 0.28)      zone = '左手';
+          else if (xr > 0.72) zone = '右手';
+          else                zone = '胸口';
+        }
+        else if (yr < 0.78) zone = '腰';
+        else                zone = '腿';
+        window.onBodyTap && window.onBodyTap(zone);
+      });
+
       app.stage.interactive = true;
       app.stage.hitArea = new PIXI.Rectangle(0, 0, innerWidth, innerHeight);
 

@@ -179,6 +179,34 @@ window.clearChat = function () {
   h.style.display = 'none';
 };
 
+// Body-part tap: inject a roleplay action and let Vega respond naturally
+let _lastTapAt = 0;
+window.onBodyTap = function (zone) {
+  const now = performance.now();
+  if (now - _lastTapAt < 3000) return;          // 3-second cooldown
+  if (document.getElementById('sendBtn').disabled) return;  // already busy
+  _lastTapAt = now;
+
+  const actionMap = {
+    '头发': '*摸了摸你的头发*',
+    '脸':   '*轻轻碰了碰你的脸*',
+    '左耳': '*碰了碰你的耳朵*',
+    '右耳': '*碰了碰你的耳朵*',
+    '脖子': '*戳了戳你的脖子*',
+    '胸口': '*点了点你的胸口*',
+    '左手': '*握了握你的手*',
+    '右手': '*握了握你的手*',
+    '腰':   '*戳了戳你的腰*',
+    '腿':   '*拍了拍你的腿*',
+  };
+  const action = actionMap[zone] || `*碰了碰你的${zone}*`;
+
+  const input = document.getElementById('chatInput');
+  if (input.value.trim()) return;   // don't interrupt if user is typing
+  input.value = action;
+  window.sendMessage();
+};
+
 // Allow Enter to send (Shift+Enter for newline)
 document.addEventListener('DOMContentLoaded', () => {
   const inp = document.getElementById('chatInput');
