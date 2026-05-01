@@ -31,8 +31,9 @@ window.sendMessage = async function () {
   setInteractionState('thinking', !!image);
   document.getElementById('sendBtn').disabled = true;
 
+  const emoInstr = '\n\nIMPORTANT: Begin every reply with exactly one emotion tag in square brackets, then your reply. Tags: [EMO:star] for excited / surprised / impressed / proud, [EMO:blush] for shy / flattered / loving / embarrassed-good, [EMO:dark] for annoyed / disappointed / sulky / frustrated, [EMO:none] for neutral. Example: "[EMO:star] Wow, that\'s amazing!" — never explain or mention the tag.';
   const messages = [
-    { role: 'system', content: s.chat.system },
+    { role: 'system', content: (s.chat.system || '') + emoInstr },
     ...chatHistory,
   ];
 
@@ -54,13 +55,15 @@ window.sendMessage = async function () {
     const data = await res.json();
     if (!res.ok || data.error) throw new Error(data.error || res.statusText);
 
-    const reply = data.text;
-    chatHistory.push({ role: 'assistant', content: reply });
-    appendBubble('assistant', reply);
+    const raw = data.text;
+    const { emo, clean } = parseEmotion(raw);
+    applyEmotion(emo);
+    chatHistory.push({ role: 'assistant', content: raw });   // keep tag in history so model stays consistent
+    appendBubble('assistant', clean);
 
     if (s.tts.enabled && s.tts.apiKey) {
       if (image) setInteractionState('glancing', true);
-      setTimeout(() => speakTTS(reply, s.tts), image ? 1200 : 0);
+      setTimeout(() => speakTTS(clean, s.tts), image ? 1200 : 0);
     } else {
       setInteractionState('idle', false);
     }
@@ -129,6 +132,22 @@ async function playAudioBuffer(arrayBuffer) {
 function setInteractionState(state, cameraRelated) {
   window.interactionState = state;
   window.glanceRight = !!cameraRelated;
+}
+
+// Strip [EMO:xxx] tag from start (or anywhere) of response, return both pieces.
+function parseEmotion(text) {
+  const re = /\[EMO:(star|blush|dark|none)\]/i;
+  const m  = text.match(re);
+  const emo = m ? m[1].toLowerCase() : null;
+  const clean = text.replace(re, '').trim();
+  return { emo, clean };
+}
+
+function applyEmotion(emo) {
+  const map = { star: 'expression3', blush: 'expression2', dark: 'expression1', none: null };
+  if (emo == null) return;        // no tag — leave previous expression
+  window.setExpr ? window.setExpr(map[emo]) : null;
+  if (map[emo] === null) window.clearExpr && window.clearExpr();
 }
 
 function appendBubble(role, text, image) {

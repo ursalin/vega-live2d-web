@@ -324,6 +324,12 @@
         // Breath
         breathPhase += dt * 1.1;
         setParam(core, 'ParamBreath', Math.sin(breathPhase) * 0.5 + 0.5);
+
+        // Expressions (driven by us, not pixi's expression manager)
+        const expr = window.currentExprName;
+        setParam(core, 'Param4', expr === 'expression1' ? 1 : 0);  // 脸黑
+        setParam(core, 'Param5', expr === 'expression2' ? 1 : 0);  // 脸红
+        setParam(core, 'Param6', expr === 'expression3' ? 1 : 0);  // 星星眼
       });
 
       document.getElementById('status').innerText = 'Vega Online ✨';
@@ -352,14 +358,11 @@
     else { audio.pause(); audio.currentTime = 0; window.isAudioPlaying = false; }
   };
 
-  window.setExpr = function (name) {
-    if (!currentModel) return;
-    try { currentModel.expression(name); } catch (e) { console.warn('expression failed:', e); }
-  };
-  window.clearExpr = function () {
-    if (!currentModel) return;
-    try { currentModel.expression(); } catch (e) { /* ignore */ }
-  };
+  // We bypass pixi-live2d-display's expression manager (its clear behavior is unreliable)
+  // and drive the 3 expression params directly each frame from currentExprName.
+  window.currentExprName = null;
+  window.setExpr   = (name) => { window.currentExprName = name; };
+  window.clearExpr = () => { window.currentExprName = null; };
 
   window.zoomIn  = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 1.1), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
   window.zoomOut = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 0.9), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
