@@ -70,10 +70,12 @@ window.sendMessage = async function () {
         appendBubble('system', '💡 在 ⚙️ 设置里勾选"启用 TTS"并填入 API Key，Vega 就能开口说话了');
       }
       setInteractionState('idle', false);
+      if (window._callIsActive && window._callIsActive()) window._callResumeSTT && window._callResumeSTT();
     }
   } catch (e) {
     appendBubble('system', '错误：' + e.message);
     setInteractionState('idle', false);
+    if (window._callIsActive && window._callIsActive()) window._callResumeSTT && window._callResumeSTT();
   } finally {
     document.getElementById('sendBtn').disabled = false;
   }
@@ -131,6 +133,7 @@ async function playAudioBuffer(arrayBuffer) {
   source.onended = () => {
     window.isAudioPlaying = false;
     setInteractionState('idle', false);
+    if (window._callIsActive && window._callIsActive()) window._callResumeSTT && window._callResumeSTT();
   };
   source.start(0);
 }

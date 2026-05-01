@@ -20,6 +20,14 @@
       border: 1px solid #0f04; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-size: 16px; }
     #topbar button:hover { background: rgba(0,255,0,.15); }
     #cameraFlipBtn { display: none; }
+    #callBtn.call-active {
+      background: rgba(255,60,60,.4); color: #fff; border-color: #f44;
+      animation: callPulse 1.4s infinite;
+    }
+    @keyframes callPulse {
+      0%,100% { box-shadow: 0 0 0 0 rgba(255,60,60,.6); }
+      50%     { box-shadow: 0 0 0 8px rgba(255,60,60,0); }
+    }
 
     /* ── Camera PiP ── */
     #cameraPip {
@@ -129,6 +137,7 @@
   <button onclick="zoomIn()">＋</button>
   <button id="cameraBtn"    onclick="toggleCamera()">📷</button>
   <button id="cameraFlipBtn" onclick="flipCamera()">🔄</button>
+  <button id="callBtn"       onclick="toggleCall()" title="视频通话">📞</button>
   <button onclick="openSettings()">⚙️</button>
 </div>
 
@@ -167,6 +176,7 @@
 <script src="app/settings.js"></script>
 <script src="app/camera.js"></script>
 <script src="app/chat.js"></script>
+<script src="app/call.js"></script>
 <script>
   // ── Pixi + Live2D ──
   const app = new PIXI.Application({
