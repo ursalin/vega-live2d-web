@@ -4,6 +4,7 @@ let recognition = null;
 let pendingText = '';
 let sttRestartTimer = null;
 let sendTimer = null;
+let lastErrorAt = 0;
 
 window.toggleCall = async function () {
   if (callActive) stopCall();
@@ -13,16 +14,32 @@ window.toggleCall = async function () {
 async function startCall() {
   const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SR) {
-    appendBubble('system', '此浏览器不支持语音识别，请用 Chrome/Edge/Safari');
+    appendBubble('system', '⚠️ 此浏览器不支持语音识别。\niOS Safari 不支持，请用 Android Chrome 或桌面 Chrome。');
     return;
   }
+
+  // Explicitly request mic so any permission/hardware errors surface NOW
+  try {
+    const probe = await navigator.mediaDevices.getUserMedia({ audio: true });
+    probe.getTracks().forEach(t => t.stop());
+  } catch (e) {
+    appendBubble('system', '🎤 麦克风访问失败: ' + e.message);
+    return;
+  }
+
   // Auto-enable camera so Vega can see user
-  if (!window.isCameraOn()) await window.toggleCamera();
+  if (!window.isCameraOn()) {
+    try { await window.toggleCamera(); } catch (e) {}
+  }
 
   recognition = new SR();
   recognition.lang = 'zh-CN';
   recognition.continuous = true;
   recognition.interimResults = true;
+
+  recognition.onstart  = () => setStatus('🎤 通话中… (说话试试)');
+  recognition.onaudiostart  = () => setStatus('🎤 听到声音了…');
+  recognition.onspeechstart = () => setStatus('🎤 正在识别…');
 
   recognition.onresult = (event) => {
     let interim = '', final = '';
@@ -31,35 +48,42 @@ async function startCall() {
       if (r.isFinal) final += r[0].transcript;
       else           interim += r[0].transcript;
     }
-    if (final) pendingText += final;
+    if (final)   pendingText += final;
     document.getElementById('chatInput').value = (pendingText + interim).trim();
+    if (interim || final) setStatus('🎤 识别中: ' + (pendingText + interim).trim().slice(-20));
 
     clearTimeout(sendTimer);
-    if (pendingText.trim()) {
-      // 1.0 second of silence after a finalized phrase = auto-send
-      sendTimer = setTimeout(flushPending, 1000);
-    }
+    if (pendingText.trim()) sendTimer = setTimeout(flushPending, 1000);
   };
 
   recognition.onerror = (e) => {
-    if (e.error === 'not-allowed') {
-      appendBubble('system', '麦克风权限被拒绝，无法通话');
+    const now = Date.now();
+    // Throttle error bubbles so we don't spam
+    if (e.error !== 'no-speech' && now - lastErrorAt > 3000) {
+      lastErrorAt = now;
+      appendBubble('system', '🎤 识别错误: ' + e.error);
+    }
+    if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
       stopCall();
     }
   };
 
   recognition.onend = () => {
-    // Browser auto-stops occasionally — restart while in call
-    if (callActive) {
-      clearTimeout(sttRestartTimer);
-      sttRestartTimer = setTimeout(() => { try { recognition.start(); } catch {} }, 250);
-    }
+    if (!callActive) return;
+    clearTimeout(sttRestartTimer);
+    sttRestartTimer = setTimeout(() => {
+      try { recognition.start(); } catch (e) { /* already started */ }
+    }, 400);
   };
 
-  try { recognition.start(); } catch {}
-  callActive = true;
-  updateCallUI(true);
-  setStatus('🎤 通话中…');
+  try {
+    recognition.start();
+    callActive = true;
+    updateCallUI(true);
+    setStatus('🎤 通话中… (说话试试)');
+  } catch (e) {
+    appendBubble('system', '🎤 启动失败: ' + e.message);
+  }
 }
 
 function stopCall() {
@@ -81,14 +105,12 @@ function flushPending() {
   pendingText = '';
   if (!text || text.length < 2) return;
   if (document.getElementById('sendBtn').disabled) {
-    // LLM busy — re-queue for after current turn
     pendingText = text;
     return;
   }
-  // Attach current camera frame to the message
   if (window.isCameraOn() && !window.getSnapPending()) window.toggleSnap();
   document.getElementById('chatInput').value = text;
-  pauseSTT();   // pause while sending + LLM thinks + TTS plays
+  pauseSTT();
   window.sendMessage();
 }
 
@@ -99,18 +121,17 @@ function pauseSTT() {
 
 function resumeSTT() {
   if (!callActive) return;
-  // Recreate handler & restart
-  if (!recognition) return;
-  recognition.onend = () => {
-    if (callActive) {
+  // Recreate the auto-restart handler & try to start again
+  if (recognition) {
+    recognition.onend = () => {
+      if (!callActive) return;
       clearTimeout(sttRestartTimer);
-      sttRestartTimer = setTimeout(() => { try { recognition.start(); } catch {} }, 250);
-    }
-  };
-  try { recognition.start(); } catch {}
+      sttRestartTimer = setTimeout(() => { try { recognition.start(); } catch {} }, 400);
+    };
+    try { recognition.start(); setStatus('🎤 通话中… (你说)'); } catch {}
+  }
 }
 
-// Exposed so chat.js can call after TTS ends or LLM done (no TTS)
 window._callPauseSTT  = pauseSTT;
 window._callResumeSTT = resumeSTT;
 window._callIsActive  = () => callActive;
