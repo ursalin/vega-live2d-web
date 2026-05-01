@@ -3,7 +3,7 @@
 	"FileReferences": {
 		"Moc": "银发拿花男.moc3",
 		"Textures": [
-			"银发拿花男.8192/texture_00.png"
+			"texture_00.png"
 		],
 		"Physics": "银发拿花男.physics3.json",
 		"DisplayInfo": "银发拿花男.cdi3.json",
