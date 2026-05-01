@@ -87,6 +87,20 @@ function buildSettingsPanel() {
       if (p.base) document.getElementById('sp-llm-base').value = p.base;
       if (p.model) document.getElementById('sp-llm-model').value = p.model;
     }
+    saveSettingsFromPanel(true);
+  });
+
+  // Auto-save on any field change so data isn't lost if user closes without clicking 保存
+  const autoSaveIds = [
+    'sp-llm-base','sp-llm-model','sp-llm-key','sp-llm-system','sp-llm-temp',
+    'sp-tts-enabled','sp-tts-provider','sp-tts-voice','sp-tts-model','sp-tts-key','sp-tts-groupid',
+  ];
+  autoSaveIds.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.addEventListener('change', () => saveSettingsFromPanel(true));
+      el.addEventListener('input',  () => saveSettingsFromPanel(true));
+    }
   });
 }
 
@@ -95,9 +109,11 @@ window.openSettings = function () {
   document.getElementById('settingsPanel').classList.add('open');
 };
 window.closeSettings = function () {
+  // Save on close too, in case user typed and clicked X without 保存
+  try { saveSettingsFromPanel(true); } catch {}
   document.getElementById('settingsPanel').classList.remove('open');
 };
-window.saveSettingsFromPanel = function () {
+window.saveSettingsFromPanel = function (silent) {
   const s = loadSettings();
   s.chat.provider    = document.getElementById('sp-llm-provider').value;
   s.chat.baseUrl     = document.getElementById('sp-llm-base').value.trim();
@@ -112,6 +128,7 @@ window.saveSettingsFromPanel = function () {
   s.tts.apiKey       = document.getElementById('sp-tts-key').value.trim();
   s.tts.extra        = { ...s.tts.extra, groupId: document.getElementById('sp-tts-groupid').value.trim() };
   saveSettings(s);
+  if (silent) return;
   closeSettings();
   document.getElementById('status').innerText = '设置已保存 ✓';
   setTimeout(() => { document.getElementById('status').innerText = 'Vega Online ✨'; }, 2000);
