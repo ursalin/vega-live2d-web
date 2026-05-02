@@ -8,7 +8,17 @@ const DEFAULTS = {
     enabled: false, provider: 'openai', baseUrl: '', model: 'tts-1',
     voice: 'nova', apiKey: '', extra: { groupId: '', speed: '1', vol: '1', pitch: '0' },
   },
+  stt: {
+    provider: 'browser',  // 'browser' | 'groq' | 'openai'
+    apiKey: '',
+  },
 };
+
+const STT_PROVIDERS = [
+  { v: 'browser', l: '浏览器内置 (免费, 仅 Chrome/Edge)' },
+  { v: 'groq',    l: 'Groq Whisper (免费, 推荐 ★)' },
+  { v: 'openai',  l: 'OpenAI Whisper (付费)' },
+];
 
 const LLM_PROVIDERS = [
   { v: 'openai',     l: 'OpenAI',           base: 'https://api.openai.com/v1',                         model: 'gpt-4o-mini' },
@@ -129,6 +139,14 @@ function buildSettingsPanel() {
       <label>MiniMax GroupId <small>（仅 MiniMax 需要）</small></label>
       <input id="sp-tts-groupid" placeholder="1234567890" value="${s.tts.extra?.groupId || ''}">
 
+      <div class="sp-section" style="margin-top:16px">🎤 语音识别 (STT, 视频通话用)</div>
+      <label>识别服务</label>
+      <select id="sp-stt-provider">
+        ${STT_PROVIDERS.map(p => `<option value="${p.v}" ${(s.stt?.provider || 'browser') === p.v ? 'selected' : ''}>${p.l}</option>`).join('')}
+      </select>
+      <label>API Key <small>（Groq: console.groq.com 免费注册）</small></label>
+      <input id="sp-stt-key" type="password" placeholder="gsk_..." value="${s.stt?.apiKey || ''}">
+
       <button class="sp-save-btn" onclick="saveSettingsFromPanel()">💾 保存</button>
     </div>`;
 
@@ -145,6 +163,7 @@ function buildSettingsPanel() {
   const autoSaveIds = [
     'sp-llm-base','sp-llm-model','sp-llm-key','sp-llm-system','sp-llm-temp',
     'sp-tts-enabled','sp-tts-provider','sp-tts-base','sp-tts-voice','sp-tts-model','sp-tts-key','sp-tts-groupid',
+    'sp-stt-provider','sp-stt-key',
   ];
   autoSaveIds.forEach(id => {
     const el = document.getElementById(id);
@@ -179,6 +198,9 @@ window.saveSettingsFromPanel = function (silent) {
   s.tts.model        = document.getElementById('sp-tts-model').value.trim();
   s.tts.apiKey       = document.getElementById('sp-tts-key').value.trim();
   s.tts.extra        = { ...s.tts.extra, groupId: document.getElementById('sp-tts-groupid').value.trim() };
+  s.stt = s.stt || {};
+  s.stt.provider     = document.getElementById('sp-stt-provider').value;
+  s.stt.apiKey       = document.getElementById('sp-stt-key').value.trim();
   saveSettings(s);
   if (silent) return;
   closeSettings();
