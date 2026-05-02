@@ -169,6 +169,8 @@
   <button onclick="moveUp()">⬆️ Up</button>
   <button onclick="moveDown()">⬇️ Down</button>
   <div style="color:#0f0;font-size:11px;margin-top:6px">── 参数探索 ──</div>
+  <button onclick="dumpParams()">📋 列出所有参数(看Console)</button>
+  <button onclick="cycleAllParams()">▶ 循环测试每个参数</button>
   <div style="display:flex;align-items:center;gap:6px">
     <span style="color:#0f0;font-size:11px;width:56px">Param<span id="lbP1">0.0</span></span>
     <input type="range" min="-1" max="1" step="0.01" value="0" style="width:120px"
@@ -470,6 +472,54 @@
   window.currentExprName = null;
   window.setExpr   = (name) => { window.currentExprName = name; };
   window.clearExpr = () => { window.currentExprName = null; };
+
+  // Dump every parameter the model actually exposes (with real min/max/default)
+  window.dumpParams = function () {
+    if (!currentModel) return;
+    const c = currentModel.internalModel.coreModel;
+    const n = c.getParameterCount();
+    const rows = [];
+    for (let i = 0; i < n; i++) {
+      rows.push({
+        id:   c.getParameterId(i),
+        min:  c.getParameterMinimumValue(i),
+        max:  c.getParameterMaximumValue(i),
+        def:  c.getParameterDefaultValue(i),
+        cur:  c.getParameterValue(i),
+      });
+    }
+    console.table(rows);
+    alert('已打印 ' + n + ' 个参数到 Console (按 F12 查看)');
+  };
+
+  // Cycle each parameter through min→max→min so user can SEE which controls what
+  window.cycleAllParams = async function () {
+    if (!currentModel) return;
+    const c = currentModel.internalModel.coreModel;
+    const n = c.getParameterCount();
+    const status = document.getElementById('status');
+    for (let i = 0; i < n; i++) {
+      const id = c.getParameterId(i);
+      const mn = c.getParameterMinimumValue(i);
+      const mx = c.getParameterMaximumValue(i);
+      const def = c.getParameterDefaultValue(i);
+      // Skip the well-known ones we already use to avoid wrecking the face
+      if (/^(ParamAngle|ParamEye|ParamMouth|ParamBrow|ParamCheek|ParamBody|ParamBreath|ParamJaw|ParamHair|Param4|Param5|Param6)/.test(id)) continue;
+      status.innerText = `测试 ${id} (${mn}~${mx}) — 看模型哪里在动`;
+      // Sweep
+      for (let t = 0; t <= 1; t += 0.05) {
+        c.setParameterValueById(id, mn + (mx - mn) * t);
+        await new Promise(r => setTimeout(r, 35));
+      }
+      for (let t = 1; t >= 0; t -= 0.05) {
+        c.setParameterValueById(id, mn + (mx - mn) * t);
+        await new Promise(r => setTimeout(r, 35));
+      }
+      c.setParameterValueById(id, def);
+      await new Promise(r => setTimeout(r, 400));
+    }
+    status.innerText = '✓ 测试完成';
+  };
 
   window.zoomIn  = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 1.1), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
   window.zoomOut = () => currentModel && (currentModel.scale.set(currentModel.scale.x * 0.9), currentModel.x = (innerWidth/2)-(currentModel.width*currentModel.scale.x/2));
