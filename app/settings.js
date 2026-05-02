@@ -38,6 +38,40 @@ function saveSettings(s) {
   localStorage.setItem('vega.settings', JSON.stringify(s));
 }
 
+// ── Profile management (named snapshots of full settings) ──
+function loadProfiles() {
+  try { return JSON.parse(localStorage.getItem('vega.profiles')) || {}; } catch { return {}; }
+}
+function saveProfiles(p) {
+  localStorage.setItem('vega.profiles', JSON.stringify(p));
+}
+window.saveCurrentAsProfile = function () {
+  const name = prompt('为当前配置起个名字（如 "OpenAI+ElevenLabs"）：');
+  if (!name) return;
+  const profiles = loadProfiles();
+  profiles[name] = loadSettings();
+  saveProfiles(profiles);
+  buildSettingsPanel();
+};
+window.loadProfile = function (name) {
+  const profiles = loadProfiles();
+  if (!profiles[name]) return;
+  saveSettings(profiles[name]);
+  buildSettingsPanel();
+  const st = document.getElementById('status');
+  if (st) {
+    st.innerText = `已切换到 「${name}」 ✓`;
+    setTimeout(() => { st.innerText = 'Vega Online ✨'; }, 1800);
+  }
+};
+window.deleteProfile = function (name) {
+  if (!confirm(`删除档案 "${name}" ？`)) return;
+  const profiles = loadProfiles();
+  delete profiles[name];
+  saveProfiles(profiles);
+  buildSettingsPanel();
+};
+
 function buildSettingsPanel() {
   const panel = document.getElementById('settingsPanel');
   const s = loadSettings();
@@ -47,10 +81,22 @@ function buildSettingsPanel() {
   const ttsOpts = TTS_PROVIDERS.map(p =>
     `<option value="${p.v}" ${s.tts.provider === p.v ? 'selected' : ''}>${p.l}</option>`).join('');
 
+  const profiles = loadProfiles();
+  const profileNames = Object.keys(profiles);
+  const profileList = profileNames.length ? profileNames.map(n => `
+    <div style="display:flex;gap:6px;align-items:center;margin:3px 0">
+      <button onclick="loadProfile('${n.replace(/'/g, "\\'")}')" style="flex:1;padding:6px 8px;background:#0f3460;color:#aef;border:1px solid #0f34;border-radius:6px;cursor:pointer;font-size:12px;text-align:left">▶ ${n}</button>
+      <button onclick="deleteProfile('${n.replace(/'/g, "\\'")}')" style="background:none;color:#f66;border:none;font-size:14px;cursor:pointer">×</button>
+    </div>`).join('') : '<div style="color:#558;font-size:11px;padding:4px 0">还没有保存的档案</div>';
+
   panel.innerHTML = `
     <div class="sp-header"><span>⚙️ 设置</span><button onclick="closeSettings()">✕</button></div>
     <div class="sp-body">
-      <div class="sp-section">💬 语言模型</div>
+      <div class="sp-section">📦 配置档案</div>
+      ${profileList}
+      <button onclick="saveCurrentAsProfile()" style="margin-top:6px;padding:8px;background:#16213e;color:#4f4;border:1px solid #0f0;border-radius:6px;cursor:pointer;font-size:12px">💾 把当前配置存为新档案</button>
+
+      <div class="sp-section" style="margin-top:16px">💬 语言模型</div>
       <label>供应商</label>
       <select id="sp-llm-provider">${llmOpts}</select>
       <label>Base URL <small>（留空用默认）</small></label>
