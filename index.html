@@ -373,10 +373,10 @@
 
         // Eyebrows — driven by current emotion + speech emphasis
         let browYT = 0, browAT = 0, browFT = 0;
-        const expr = window.currentExprName;
-        if (expr === 'expression1')      { browYT = -0.55; browAT = -0.7; browFT = -0.3; }  // 脸黑/不爽
-        else if (expr === 'expression2') { browYT =  0.25; browAT =  0.3; browFT =  0.15; } // 脸红/害羞
-        else if (expr === 'expression3') { browYT =  0.65; browAT =  0.4; browFT =  0.45; } // 星星/兴奋
+        const exprName = window.currentExprName;
+        if (exprName === 'expression1')      { browYT = -0.55; browAT = -0.7; browFT = -0.3; }  // 脸黑/不爽
+        else if (exprName === 'expression2') { browYT =  0.25; browAT =  0.3; browFT =  0.15; } // 脸红/害羞
+        else if (exprName === 'expression3') { browYT =  0.65; browAT =  0.4; browFT =  0.45; } // 星星/兴奋
         if (speaking) browYT += mouthEnvelope * 0.18;       // brow lift on emphasized syllables
         browYT += liveBreath * 0.04;                          // gentle breath flutter
         const bk = 1 - Math.exp(-dt / 0.22);
