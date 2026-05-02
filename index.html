@@ -168,6 +168,22 @@
   <button onclick="zoomOut()">🔍 Zoom Out</button>
   <button onclick="moveUp()">⬆️ Up</button>
   <button onclick="moveDown()">⬇️ Down</button>
+  <div style="color:#0f0;font-size:11px;margin-top:6px">── 参数探索 ──</div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <span style="color:#0f0;font-size:11px;width:56px">Param<span id="lbP1">0.0</span></span>
+    <input type="range" min="-1" max="1" step="0.01" value="0" style="width:120px"
+      oninput="document.getElementById('lbP1').textContent=parseFloat(this.value).toFixed(2);window._dbgP1=parseFloat(this.value)">
+  </div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <span style="color:#0f0;font-size:11px;width:56px">Param2<span id="lbP2">0.0</span></span>
+    <input type="range" min="-1" max="1" step="0.01" value="0" style="width:120px"
+      oninput="document.getElementById('lbP2').textContent=parseFloat(this.value).toFixed(2);window._dbgP2=parseFloat(this.value)">
+  </div>
+  <div style="display:flex;align-items:center;gap:6px">
+    <span style="color:#0f0;font-size:11px;width:56px">Param3<span id="lbP3">0.0</span></span>
+    <input type="range" min="-1" max="1" step="0.01" value="0" style="width:120px"
+      oninput="document.getElementById('lbP3').textContent=parseFloat(this.value).toFixed(2);window._dbgP3=parseFloat(this.value)">
+  </div>
 </div>
 
 <div id="settingsPanel"></div>
@@ -410,6 +426,11 @@
         // Breath
         breathPhase += dt * 1.1;
         setParam(core, 'ParamBreath', Math.sin(breathPhase) * 0.5 + 0.5);
+
+        // Debug param sliders (DEV panel)
+        if (window._dbgP1 !== undefined) setParam(core, 'Param',  window._dbgP1);
+        if (window._dbgP2 !== undefined) setParam(core, 'Param2', window._dbgP2);
+        if (window._dbgP3 !== undefined) setParam(core, 'Param3', window._dbgP3);
 
         // Expressions (driven by us, not pixi's expression manager)
         const expr = window.currentExprName;
