@@ -495,28 +495,38 @@
   // Cycle each parameter through min→max→min so user can SEE which controls what
   window.cycleAllParams = async function () {
     if (!currentModel) return;
-    const c = currentModel.internalModel.coreModel;
-    const n = c.getParameterCount();
+    const core = currentModel.internalModel.coreModel;
     const status = document.getElementById('status');
-    for (let i = 0; i < n; i++) {
-      const id = c.getParameterId(i);
-      const mn = c.getParameterMinimumValue(i);
-      const mx = c.getParameterMaximumValue(i);
-      const def = c.getParameterDefaultValue(i);
-      // Skip the well-known ones we already use to avoid wrecking the face
-      if (/^(ParamAngle|ParamEye|ParamMouth|ParamBrow|ParamCheek|ParamBody|ParamBreath|ParamJaw|ParamHair|Param4|Param5|Param6)/.test(id)) continue;
-      status.innerText = `测试 ${id} (${mn}~${mx}) — 看模型哪里在动`;
-      // Sweep
-      for (let t = 0; t <= 1; t += 0.05) {
-        c.setParameterValueById(id, mn + (mx - mn) * t);
-        await new Promise(r => setTimeout(r, 35));
+
+    // Unknown params to discover — test with wide range
+    const testList = [
+      { id: 'Param',  min: -30, max: 30 },
+      { id: 'Param2', min: -30, max: 30 },
+      { id: 'Param3', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_1_ArtMesh67', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_2_ArtMesh67', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_3_ArtMesh67', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_4_ArtMesh67', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_5_ArtMesh67', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_1_ArtMesh68', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_2_ArtMesh68', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_3_ArtMesh68', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_4_ArtMesh68', min: -30, max: 30 },
+      { id: 'Param_Angle_Rotation_5_ArtMesh68', min: -30, max: 30 },
+    ];
+
+    for (const { id, min, max } of testList) {
+      status.innerText = `▶ 测试: ${id}`;
+      for (let t = 0; t <= 1; t += 0.04) {
+        try { core.setParameterValueById(id, min + (max - min) * t); } catch {}
+        await new Promise(r => setTimeout(r, 30));
       }
-      for (let t = 1; t >= 0; t -= 0.05) {
-        c.setParameterValueById(id, mn + (mx - mn) * t);
-        await new Promise(r => setTimeout(r, 35));
+      for (let t = 1; t >= 0; t -= 0.04) {
+        try { core.setParameterValueById(id, min + (max - min) * t); } catch {}
+        await new Promise(r => setTimeout(r, 30));
       }
-      c.setParameterValueById(id, def);
-      await new Promise(r => setTimeout(r, 400));
+      try { core.setParameterValueById(id, 0); } catch {}
+      await new Promise(r => setTimeout(r, 600));
     }
     status.innerText = '✓ 测试完成';
   };
